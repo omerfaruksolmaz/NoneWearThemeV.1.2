@@ -1,0 +1,91 @@
+{% comment %}
+  NONEWEAR — Ürün galerisi
+  - Tüm görseller uniform 2 sütun grid (ürün listesiyle aynı stil)
+  - 1px separator çizgiler, dış bordür
+  - Hover → magnifier büyüteç popup
+  - Tıkla → lightbox tam ekran
+{% endcomment %}
+{%- liquid
+  if product == blank
+    assign product_media_count = 0
+  else
+    assign product_media_count = product.media.size
+  endif
+  assign lightbox_id = 'NwLightbox-' | append: section.id
+-%}
+
+<div
+  class="nw-gallery nw-product-gallery"
+  id="MediaGallery-{{ section.id }}"
+  data-lightbox-id="{{ lightbox_id }}"
+  aria-label="Ürün görselleri"
+>
+
+  {%- if product_media_count == 0 -%}
+    <div class="nw-product-gallery__empty">
+      <span>Görsel yok</span>
+    </div>
+
+  {%- else -%}
+    <ul class="nw-product-gallery__grid" role="list">
+      {%- for media in product.media -%}
+        {%- assign img_idx = forloop.index0 -%}
+        {%- if forloop.first -%}
+          {%- assign img_loading = 'eager' -%}
+        {%- else -%}
+          {%- assign img_loading = 'lazy' -%}
+        {%- endif -%}
+        <li class="nw-product-gallery__item">
+
+          {%- if media.media_type == 'image' -%}
+            {%- assign full_url = media | image_url: width: 3000 -%}
+            <div
+              class="nw-magnifier-frame nw-product-gallery__frame nw-lightbox-trigger"
+              role="button"
+              tabindex="0"
+              aria-label="Görseli büyüt"
+              data-idx="{{ img_idx }}"
+            >
+              <img
+                class="nw-product-gallery__img"
+                src="{{ media | image_url: width: 1200 }}"
+                srcset="{{ media | image_url: width: 400 }} 400w, {{ media | image_url: width: 600 }} 600w, {{ media | image_url: width: 900 }} 900w, {{ media | image_url: width: 1200 }} 1200w"
+                sizes="(min-width: 990px) 40vw, (min-width: 750px) 50vw, 100vw"
+                loading="{{ img_loading }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                data-full="{{ full_url }}"
+                width="{{ media.width }}"
+                height="{{ media.height }}"
+              >
+            </div>
+
+          {%- else -%}
+            <div class="nw-product-gallery__frame nw-product-gallery__frame--media" data-idx="{{ img_idx }}">
+              {{ media | media_tag: image_size: '1200x', controls: true, preload: 'none' }}
+            </div>
+          {%- endif -%}
+
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+</div>
+
+{%- comment %} LIGHTBOX {%- endcomment %}
+<div
+  id="{{ lightbox_id }}"
+  class="nbhd-lightbox"
+  aria-modal="true"
+  role="dialog"
+  aria-label="Görsel galerisi"
+  aria-hidden="true"
+>
+  <div class="nbhd-lightbox__inner">
+    <img class="nbhd-lightbox__img" src="" alt="" draggable="false">
+  </div>
+  <button class="nbhd-lightbox__close" aria-label="Kapat">&#10005;</button>
+  <button class="nbhd-lightbox__nav nbhd-lightbox__nav--prev" aria-label="Önceki">&#8592;</button>
+  <button class="nbhd-lightbox__nav nbhd-lightbox__nav--next" aria-label="Sonraki">&#8594;</button>
+  <div class="nbhd-lightbox__counter"></div>
+</div>

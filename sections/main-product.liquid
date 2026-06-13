@@ -1,0 +1,358 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- assign first_3d_model = product.media | where: 'media_type', 'model' | first -%}
+
+<product-info
+  id="MainProduct-{{ section.id }}"
+  class="editorial-product section-{{ section.id }}-padding editorial-product-section"
+  data-section="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-update-url="true"
+  data-url="{{ product.url }}"
+>
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {% unless product.has_only_default_variant %}
+    {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+    {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+    {{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+  {% endunless %}
+
+  <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+  {%- if product.media.size > 0 -%}
+    <script src="{{ 'media-gallery.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+  {%- if first_3d_model -%}
+    <script src="{{ 'product-model.js' | asset_url }}" defer></script>
+    <script type="application/json" id="ProductJSON-{{ product.id }}">
+      {{ product.media | where: 'media_type', 'model' | json }}
+    </script>
+  {%- endif -%}
+
+  {%- comment %} BREADCRUMB — ürün yol haritası {%- endcomment %}
+  <nav class="nw-product-breadcrumb" aria-label="Breadcrumb">
+    <a class="nw-product-breadcrumb__link" href="{{ routes.root_url }}">HOME</a>
+    <span class="nw-product-breadcrumb__sep" aria-hidden="true">/</span>
+
+    {%- if collection != blank and collection.handle != blank -%}
+      <a class="nw-product-breadcrumb__link" href="/collections/{{ collection.handle }}">{{ collection.title | upcase | escape }}</a>
+      <span class="nw-product-breadcrumb__sep" aria-hidden="true">/</span>
+    {%- elsif product.type != blank -%}
+      <a class="nw-product-breadcrumb__link" href="{{ routes.collections_url }}/{{ product.type | handle }}">{{ product.type | upcase | escape }}</a>
+      <span class="nw-product-breadcrumb__sep" aria-hidden="true">/</span>
+    {%- endif -%}
+
+    <span class="nw-product-breadcrumb__current" aria-current="page">{{ product.title | escape }}</span>
+  </nav>
+
+  <div class="page-width">
+    <div class="editorial-product__layout">
+      <div class="editorial-product__gallery-column">
+        {% render 'editorial-product-gallery', product: product, section: section %}
+      </div>
+
+      <div class="editorial-product__info-column">
+        {% render 'editorial-product-info', product: product, section: section %}
+      </div>
+    </div>
+  </div>
+
+  {%- render 'product-json-ld', product: product -%}
+
+  {%- comment -%} BreadcrumbList JSON-LD {%- endcomment -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": {{ request.origin | json }}
+      }
+      {%- if collection != blank and collection.handle != blank -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": {{ shop.url | append: collection.url | json }}
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ product.title | json }},
+        "item": {{ shop.url | append: product.url | json }}
+      }
+      {%- elsif product.type != blank -%}
+      {%- assign type_handle = product.type | handle -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ product.type | json }},
+        "item": {{ shop.url | append: routes.collections_url | append: '/' | append: type_handle | json }}
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ product.title | json }},
+        "item": {{ shop.url | append: product.url | json }}
+      }
+      {%- else -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ product.title | json }},
+        "item": {{ shop.url | append: product.url | json }}
+      }
+      {%- endif -%}
+    ]
+  }
+  </script>
+</product-info>
+
+{% schema %}
+{
+  "name": "Main product",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "Text style",
+          "default": "body",
+          "options": [
+            {
+              "value": "body",
+              "label": "Body"
+            },
+            {
+              "value": "subtitle",
+              "label": "Subtitle"
+            },
+            {
+              "value": "uppercase",
+              "label": "Uppercase"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "inventory",
+      "name": "Inventory",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "label": "Picker type",
+          "default": "button",
+          "options": [
+            {
+              "value": "dropdown",
+              "label": "Dropdown"
+            },
+            {
+              "value": "button",
+              "label": "Buttons"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "swatch_shape",
+          "label": "Swatch shape",
+          "default": "square",
+          "options": [
+            {
+              "value": "circle",
+              "label": "Circle"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "label": "Show dynamic checkout",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_gift_card_recipient",
+          "label": "Show gift card recipient",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Liquid"
+        }
+      ]
+    },
+    {
+      "type": "collapsible_tab",
+      "name": "Collapsible tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "settings": [
+        {
+          "type": "text",
+          "id": "share_label",
+          "label": "Share label",
+          "default": "Share"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_info",
+      "label": "Enable sticky info",
+      "default": true
+    },
+    {
+      "type": "page",
+      "id": "size_guide_page",
+      "label": "Size guide page"
+    },
+    {
+      "type": "text",
+      "id": "size_guide_label",
+      "label": "Size guide label",
+      "default": "Size guide"
+    },
+    {
+      "type": "text",
+      "id": "support_link_label",
+      "label": "Support link label"
+    },
+    {
+      "type": "url",
+      "id": "support_link_url",
+      "label": "Support link URL"
+    },
+    {
+      "type": "text",
+      "id": "delivery_link_label",
+      "label": "Delivery link label"
+    },
+    {
+      "type": "url",
+      "id": "delivery_link_url",
+      "label": "Delivery link URL"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

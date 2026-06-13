@@ -1,0 +1,490 @@
+{%- style -%}
+  .section-header { margin-bottom: 0; }
+{%- endstyle -%}
+
+<sticky-header
+  data-sticky-type="{{ section.settings.sticky_header_type }}"
+  class="section-header nbhd-header-wrapper"
+>
+  <header class="nbhd-header" role="banner">
+
+    {%- comment %} LOGO {%- endcomment %}
+    <a href="{{ routes.root_url }}" class="nbhd-header__logo">
+      <img
+        class="nbhd-header__logo-img nbhd-header__logo-img--light"
+        src="{{ 'nonewear-wordmark-black.png' | asset_url }}"
+        alt="None Wear"
+        width="360"
+        height="50"
+        loading="eager"
+      >
+      <img
+        class="nbhd-header__logo-img nbhd-header__logo-img--dark"
+        src="{{ 'nonewear-wordmark-white.png' | asset_url }}"
+        alt="None Wear"
+        width="360"
+        height="50"
+        loading="eager"
+      >
+    </a>
+
+    {%- comment %} SEARCH {%- endcomment %}
+    <div class="nbhd-header__search">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="nbhd-header__search-form">
+        <input type="hidden" name="type" value="product">
+        <input
+          class="nbhd-header__search-input"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="search"
+          autocomplete="off"
+          aria-label="Search"
+        >
+      </form>
+    </div>
+
+    {%- comment %} NAV – DESKTOP {%- endcomment %}
+    <nav class="nbhd-header__nav" role="navigation" aria-label="Primary">
+      <ul class="nbhd-header__nav-list">
+
+        {%- comment %} ÜRÜNLER {%- endcomment %}
+        <li class="nbhd-header__nav-item">
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="nbhd-header__nav-link{% if request.path == routes.all_products_collection_url %} is-active{% endif %}"
+          >PRODUCTS</a>
+        </li>
+
+        {%- comment %} KATEGORİLER + HOVER DROPDOWN {%- endcomment %}
+        <li class="nbhd-header__nav-item nbhd-header__nav-item--has-drop">
+          <a
+            href="{{ routes.collections_url }}"
+            class="nbhd-header__nav-link{% if request.path contains '/collections' %} is-active{% endif %}"
+          >CATEGORIES</a>
+
+          <div class="nbhd-drop" aria-hidden="true">
+            <ul class="nbhd-drop__list">
+              <li class="nbhd-drop__item">
+                <a class="nbhd-drop__link" href="{{ routes.all_products_collection_url }}">
+                  <span class="nbhd-drop__label">All Products</span>
+                </a>
+              </li>
+              {%- for col in collections -%}
+                {%- unless col.handle == 'all' or col.handle == 'frontpage' -%}
+                  <li class="nbhd-drop__item">
+                    <a class="nbhd-drop__link{% if request.path contains col.handle %} is-active{% endif %}" href="{{ col.url }}">
+                      <span class="nbhd-drop__label">{{ col.title | escape }}</span>
+                      <span class="nbhd-drop__count">{{ col.products_count }}</span>
+                    </a>
+                  </li>
+                {%- endunless -%}
+              {%- endfor -%}
+            </ul>
+          </div>
+        </li>
+
+      </ul>
+    </nav>
+
+    {%- comment %} UTILS – Login + Cart {%- endcomment %}
+    <div class="nbhd-header__utils">
+      <a
+        href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+        class="nbhd-header__util-link"
+        rel="nofollow"
+        aria-label="Account"
+      >
+        {%- if customer -%}ACCOUNT{%- else -%}LOGIN{%- endif -%}
+      </a>
+      <div class="nbhd-header__cart-wrap" id="nbhd-cart-wrap">
+        <a href="{{ routes.cart_url }}" class="nbhd-header__util-link nbhd-header__cart-link" aria-label="Cart">
+          CART
+          <span id="cart-icon-bubble">
+            {%- if cart.item_count > 0 -%}
+              <span class="nbhd-header__cart-bubble">{{ cart.item_count }}</span>
+            {%- endif -%}
+          </span>
+        </a>
+        <div class="nbhd-mini-cart" id="nbhd-mini-cart" aria-hidden="true">
+          <div class="nbhd-mini-cart__inner">
+            <div class="nbhd-mini-cart__items" id="nbhd-mini-cart-items">
+              <p class="nbhd-mini-cart__loading">Yükleniyor…</p>
+            </div>
+            <div class="nbhd-mini-cart__footer">
+              <a href="{{ routes.cart_url }}" class="nbhd-mini-cart__btn">SEPETE GİT</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {%- comment %} MOBILE UTILS {%- endcomment %}
+    <div class="nbhd-header__mobile-utils">
+      <a href="{{ routes.cart_url }}" class="nbhd-header__mobile-cart" aria-label="Cart">
+        CART
+        {%- if cart.item_count > 0 -%}
+          <span class="nbhd-header__cart-bubble">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+
+      <button
+        class="nbhd-header__hamburger"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="nbhd-mobile-drawer"
+      >
+        <span></span><span></span>
+      </button>
+    </div>
+
+  </header>
+</sticky-header>
+
+{%- comment %} MOBILE DRAWER {%- endcomment %}
+<div id="nbhd-mobile-drawer" class="nbhd-drawer" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="nbhd-drawer__overlay"></div>
+  <div class="nbhd-drawer__panel">
+
+    <div class="nbhd-drawer__header">
+      <a href="{{ routes.root_url }}" class="nbhd-drawer__logo">none wear</a>
+      <button class="nbhd-drawer__close" aria-label="Close">&#10005;</button>
+    </div>
+
+    <div class="nbhd-drawer__search">
+      <form action="{{ routes.search_url }}" method="get" role="search">
+        <input type="hidden" name="type" value="product">
+        <input
+          class="nbhd-drawer__search-input"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="search"
+          autocomplete="off"
+        >
+      </form>
+    </div>
+
+    <nav class="nbhd-drawer__body">
+      <a class="nbhd-drawer__main-link" href="{{ routes.all_products_collection_url }}">products</a>
+
+      <div class="nbhd-drawer__section">
+        <span class="nbhd-drawer__section-label">categories</span>
+        <ul class="nbhd-drawer__cat-list">
+          <li><a href="{{ routes.all_products_collection_url }}">All Products</a></li>
+          {%- for col in collections -%}
+            {%- unless col.handle == 'all' or col.handle == 'frontpage' -%}
+              <li>
+                <a href="{{ col.url }}">
+                  {{ col.title | escape }}
+                  <span>{{ col.products_count }}</span>
+                </a>
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    </nav>
+
+    <div class="nbhd-drawer__footer">
+      <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}">
+        {%- if customer -%}account{%- else -%}login{%- endif -%}
+      </a>
+      <a href="{{ routes.cart_url }}">
+        cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{%- if settings.cart_type == 'notification' -%}
+  {%- render 'cart-notification' -%}
+{%- endif -%}
+
+{% javascript %}
+class StickyHeader extends HTMLElement {
+  connectedCallback() {
+    this.header = this; // sticky-header elementi kendisi — .nbhd-header-wrapper
+    this.headerIsAlwaysSticky =
+      this.getAttribute('data-sticky-type') === 'always' ||
+      this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+    this.headerBounds = {};
+
+    this.setHeaderHeight();
+    window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
+
+    if (this.headerIsAlwaysSticky) {
+      this.header.classList.add('shopify-section-header-sticky');
+    }
+
+    this.currentScrollTop = 0;
+    this.preventReveal = false;
+    this.predictiveSearch = this.querySelector('predictive-search');
+    this.onScrollHandler = this.onScroll.bind(this);
+    this.hideHeaderOnScrollUp = () => (this.preventReveal = true);
+
+    this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.addEventListener('scroll', this.onScrollHandler, { passive: true });
+
+    this.createObserver();
+    this.initMobileDrawer();
+  }
+
+  setHeaderHeight() {
+    if (!this.header) return;
+    document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.removeEventListener('scroll', this.onScrollHandler);
+  }
+
+  createObserver() {
+    if (!this.header) return;
+    const observer = new IntersectionObserver((entries, obs) => {
+      this.headerBounds = entries[0].intersectionRect;
+      obs.disconnect();
+    });
+    observer.observe(this.header);
+  }
+
+  onScroll() {
+    if (!this.header) return;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (this.predictiveSearch && this.predictiveSearch.isOpen) return;
+
+    if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+      requestAnimationFrame(this.hide.bind(this));
+    } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+      if (!this.preventReveal) {
+        requestAnimationFrame(this.reveal.bind(this));
+      } else {
+        window.clearTimeout(this.isScrolling);
+        this.isScrolling = setTimeout(() => { this.preventReveal = false; }, 66);
+        requestAnimationFrame(this.hide.bind(this));
+      }
+    } else if (scrollTop <= this.headerBounds.top) {
+      requestAnimationFrame(this.reset.bind(this));
+    }
+    this.currentScrollTop = scrollTop;
+  }
+
+  hide() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky');
+    this.header.classList.remove('animate');
+  }
+
+  reveal() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.add('shopify-section-header-sticky', 'animate');
+    this.header.classList.remove('shopify-section-header-hidden');
+  }
+
+  reset() {
+    if (this.headerIsAlwaysSticky) return;
+    this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate');
+  }
+
+  initMobileDrawer() {
+    const hamburger = document.querySelector('.nbhd-header__hamburger');
+    const drawer = document.getElementById('nbhd-mobile-drawer');
+    if (!hamburger || !drawer) return;
+
+    const closeBtn = drawer.querySelector('.nbhd-drawer__close');
+    const overlay = drawer.querySelector('.nbhd-drawer__overlay');
+
+    const open = () => {
+      drawer.classList.add('is-open');
+      drawer.setAttribute('aria-hidden', 'false');
+      hamburger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => {
+      drawer.classList.remove('is-open');
+      drawer.setAttribute('aria-hidden', 'true');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    };
+
+    hamburger.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (overlay) overlay.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+    });
+  }
+}
+customElements.define('sticky-header', StickyHeader);
+
+// Kategori dropdown — PORTAL PATTERN
+// Drop'u doğrudan body'e taşı → header stacking context'inden çıkar
+document.querySelectorAll('.nbhd-header__nav-item--has-drop').forEach(function(item) {
+  var drop = item.querySelector('.nbhd-drop');
+  if (!drop) return;
+
+  // Body'e taşı — stacking context tamamen kırılır
+  document.body.appendChild(drop);
+
+  var leaveTimer = null;
+
+  function reposition() {
+    var r = item.getBoundingClientRect();
+    var headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 48;
+    var left = r.left;
+    var maxLeft = window.innerWidth - drop.offsetWidth - 8;
+    drop.style.top = headerHeight + 'px';
+    drop.style.left = Math.max(8, Math.min(left, maxLeft)) + 'px';
+  }
+
+  function showDrop() {
+    clearTimeout(leaveTimer);
+    // Önce konumlandır, sonra göster
+    drop.style.left = '-9999px';
+    drop.classList.add('is-open');
+    requestAnimationFrame(function() {
+      reposition();
+    });
+  }
+
+  function hideDrop() {
+    leaveTimer = setTimeout(function() {
+      drop.classList.remove('is-open');
+    }, 80);
+  }
+
+  item.addEventListener('mouseenter', showDrop);
+  item.addEventListener('mouseleave', hideDrop);
+  drop.addEventListener('mouseenter', function() { clearTimeout(leaveTimer); });
+  drop.addEventListener('mouseleave', hideDrop);
+
+  window.addEventListener('resize', function() {
+    if (drop.classList.contains('is-open')) reposition();
+  }, { passive: true });
+});
+
+// ── MINI CART HOVER ──────────────────────────────────────────
+(function() {
+  var wrap = document.getElementById('nbhd-cart-wrap');
+  var panel = document.getElementById('nbhd-mini-cart');
+  var itemsEl = document.getElementById('nbhd-mini-cart-items');
+  if (!wrap || !panel || !itemsEl) return;
+
+  // Portal: body'e taşı — header stacking context'inden çıkar
+  document.body.appendChild(panel);
+
+  var leaveTimer = null;
+  var loaded = false;
+
+  function money(cents) {
+    return (cents / 100).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+  }
+
+  function renderCart(cart) {
+    if (cart.item_count === 0) {
+      itemsEl.innerHTML = '<p class="nbhd-mini-cart__empty">Sepetiniz boş.</p>';
+      return;
+    }
+    var html = '';
+    cart.items.slice(0, 5).forEach(function(item) {
+      html += '<div class="nbhd-mini-cart__item">';
+      if (item.image) {
+        html += '<img class="nbhd-mini-cart__img" src="' + item.image + '" alt="' + (item.title || '') + '" width="56" height="56">';
+      }
+      html += '<div class="nbhd-mini-cart__info">';
+      html += '<div class="nbhd-mini-cart__name">' + item.product_title + '</div>';
+      if (item.variant_title && item.variant_title !== 'Default Title') {
+        html += '<div class="nbhd-mini-cart__variant">' + item.variant_title + '</div>';
+      }
+      html += '<div class="nbhd-mini-cart__row">';
+      html += '<span class="nbhd-mini-cart__qty">×' + item.quantity + '</span>';
+      html += '<span class="nbhd-mini-cart__price">' + money(item.final_line_price) + '</span>';
+      html += '</div>';
+      html += '</div></div>';
+    });
+    if (cart.item_count > 5) {
+      html += '<p class="nbhd-mini-cart__more">+' + (cart.item_count - 5) + ' ürün daha</p>';
+    }
+    html += '<div class="nbhd-mini-cart__subtotal">';
+    html += '<span>Toplam</span><span>' + money(cart.total_price) + '</span>';
+    html += '</div>';
+    itemsEl.innerHTML = html;
+  }
+
+  function fetchCart() {
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        loaded = true;
+        renderCart(cart);
+      })
+      .catch(function() {
+        itemsEl.innerHTML = '<p class="nbhd-mini-cart__empty">Yüklenemedi.</p>';
+      });
+  }
+
+  function positionPanel() {
+    var headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 48;
+    panel.style.top = headerH + 'px';
+  }
+
+  function openMini() {
+    clearTimeout(leaveTimer);
+    positionPanel();
+    panel.setAttribute('aria-hidden', 'false');
+    panel.classList.add('is-open');
+    if (!loaded) fetchCart();
+  }
+
+  function closeMini() {
+    leaveTimer = setTimeout(function() {
+      panel.setAttribute('aria-hidden', 'true');
+      panel.classList.remove('is-open');
+    }, 120);
+  }
+
+  wrap.addEventListener('mouseenter', openMini);
+  wrap.addEventListener('mouseleave', closeMini);
+  panel.addEventListener('mouseenter', function() { clearTimeout(leaveTimer); });
+  panel.addEventListener('mouseleave', closeMini);
+
+  // Cart güncellenince mini-cart'ı sıfırla (sonraki hover'da yeniden fetch eder)
+  document.addEventListener('cart:updated', function() { loaded = false; });
+  if (typeof subscribe !== 'undefined' && typeof PUB_SUB_EVENTS !== 'undefined') {
+    subscribe(PUB_SUB_EVENTS.cartUpdate, function() { loaded = false; fetchCart(); });
+  }
+})();
+{% endjavascript %}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "label": "Sticky header",
+      "default": "always",
+      "options": [
+        { "value": "none",              "label": "None" },
+        { "value": "on-scroll-up",      "label": "Show on scroll up" },
+        { "value": "always",            "label": "Always" },
+        { "value": "reduce-logo-size",  "label": "Always (reduced logo)" }
+      ]
+    }
+  ],
+  "blocks": [{ "type": "@app" }]
+}
+{% endschema %}

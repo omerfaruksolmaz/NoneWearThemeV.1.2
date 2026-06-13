@@ -1,0 +1,96 @@
+{%- liquid
+  case section.settings.sort
+    when 'products_high', 'products_low'
+      assign collections = collections | sort: 'all_products_count'
+    when 'date', 'date_reversed'
+      assign collections = collections | sort: 'published_at'
+  endcase
+  if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+    assign collections = collections | reverse
+  endif
+-%}
+
+<section class="nw-collection-list">
+  <div class="page-width">
+    {%- paginate collections by 30 -%}
+      {%- assign visible_collections = collections | where: 'handle' -%}
+      <div class="nw-collection-grid">
+        {%- for col in collections -%}
+          {%- unless col.handle == 'frontpage' -%}
+            <a class="nw-col-card" href="{{ col.url }}">
+              <div class="nw-col-card__media">
+                {%- if col.featured_image -%}
+                  <img
+                    src="{{ col.featured_image | image_url: width: 800 }}"
+                    srcset="{{ col.featured_image | image_url: width: 400 }} 400w, {{ col.featured_image | image_url: width: 600 }} 600w, {{ col.featured_image | image_url: width: 800 }} 800w"
+                    sizes="(min-width: 990px) calc((100vw - 6rem) / 5), (min-width: 750px) calc((100vw - 4rem) / 4), (min-width: 600px) calc((100vw - 3rem) / 3), calc((100vw - 2rem) / 2)"
+                    alt="{{ col.featured_image.alt | default: col.title | escape }}"
+                    width="{{ col.featured_image.width }}"
+                    height="{{ col.featured_image.height }}"
+                    loading="lazy"
+                    class="nw-col-card__img"
+                  >
+                {%- else -%}
+                  <div class="nw-col-card__placeholder">
+                    {{ col.title | truncate: 2, '' | upcase }}
+                  </div>
+                {%- endif -%}
+              </div>
+              <div class="nw-col-card__body">
+                <div class="nw-col-card__title">{{ col.title | escape }}</div>
+                <div class="nw-col-card__count">{{ col.products_count }} products</div>
+              </div>
+            </a>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="editorial-pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}
+            <a class="editorial-pagination__item" href="{{ paginate.previous.url }}">Geri</a>
+          {%- else -%}
+            <span class="editorial-pagination__item is-disabled">Geri</span>
+          {%- endif -%}
+          {%- for part in paginate.parts -%}
+            {%- if part.is_link -%}
+              <a class="editorial-pagination__item" href="{{ part.url }}">{{ part.title }}</a>
+            {%- elsif part.title == paginate.current_page -%}
+              <span class="editorial-pagination__item is-current">{{ part.title }}</span>
+            {%- else -%}
+              <span class="editorial-pagination__item">{{ part.title }}</span>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if paginate.next -%}
+            <a class="editorial-pagination__item" href="{{ paginate.next.url }}">İleri</a>
+          {%- else -%}
+            <span class="editorial-pagination__item is-disabled">İleri</span>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection list",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "sort",
+      "label": "Sort by",
+      "default": "alphabetical",
+      "options": [
+        { "value": "alphabetical",          "label": "A–Z" },
+        { "value": "alphabetical_reversed", "label": "Z–A" },
+        { "value": "date_reversed",         "label": "Newest" },
+        { "value": "date",                  "label": "Oldest" },
+        { "value": "products_high",         "label": "Most products" },
+        { "value": "products_low",          "label": "Fewest products" }
+      ]
+    }
+  ]
+}
+{% endschema %}

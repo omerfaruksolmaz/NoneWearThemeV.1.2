@@ -1,0 +1,329 @@
+{%- liquid
+  assign has_social_links = false
+  if settings.social_instagram_link != blank
+    assign has_social_links = true
+  elsif settings.social_facebook_link != blank
+    assign has_social_links = true
+  elsif settings.social_tiktok_link != blank
+    assign has_social_links = true
+  elsif settings.social_youtube_link != blank
+    assign has_social_links = true
+  elsif settings.social_vimeo_link != blank
+    assign has_social_links = true
+  endif
+-%}
+
+{%- style -%}
+  .footer {
+    margin-top: {{ section.settings.margin_top | times: 0.75 | round: 0 }}px;
+  }
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .footer {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<footer class="footer editorial-footer section-{{ section.id }}-padding">
+<div class="page-width">
+  <div class="editorial-footer__grid">
+
+    <div class="editorial-footer__column editorial-footer__brand-column">
+      <a class="editorial-footer__brand editorial-footer__brand-text" href="{{ routes.root_url }}" aria-label="None Wear">none wear</a>
+      <hr class="editorial-footer__rule">
+
+      <p class="editorial-footer__brand-desc">
+        {{ section.settings.brand_text | default: 'None Wear is a clothing brand founded in 2025.' }}
+      </p>
+
+      <p class="editorial-footer__contact">
+        <a href="mailto:info@nonewear.com.tr">info@nonewear.com.tr</a><br>
+        <a href="mailto:destek@nonewear.com.tr">destek@nonewear.com.tr</a>
+      </p>
+    </div>
+
+    <div class="editorial-footer__column">
+      <h2 class="editorial-footer__heading">Shop</h2>
+      <hr class="editorial-footer__rule">
+      <ul class="editorial-footer__menu">
+        <li><a href="{{ routes.collections_url }}">Tüm ürünler</a></li>
+        <li><a href="{{ routes.root_url }}#drop">Drop</a></li>
+        <li><a href="{{ routes.search_url }}">Arama</a></li>
+        <li><a href="{{ routes.cart_url }}">Sepet</a></li>
+      </ul>
+    </div>
+
+    <div class="editorial-footer__column">
+      <h2 class="editorial-footer__heading">Destek</h2>
+      <hr class="editorial-footer__rule">
+      <ul class="editorial-footer__menu">
+        <li><a href="mailto:destek@nonewear.com.tr">Müşteri desteği</a></li>
+        <li><a href="/pages/delivery-returns">İade / değişim</a></li>
+        <li><a href="/pages/distance-sales">Satış koşulları</a></li>
+        <li><a href="/pages/privacy">KVKK / gizlilik</a></li>
+        <li><a href="/pages/contact">İletişim</a></li>
+        <li><a href="/pages/about">Hakkımızda</a></li>
+      </ul>
+    </div>
+
+    <div class="editorial-footer__column">
+      <h2 class="editorial-footer__heading">Koleksiyonlar</h2>
+      <hr class="editorial-footer__rule">
+      <ul class="editorial-footer__menu">
+        {%- liquid
+          # Koleksiyonlar otomatik listelenir; footer şişmesin diye en fazla 5 tane
+          assign footer_collection_count = 0
+        -%}
+        {%- for col in collections -%}
+          {%- if col.handle == 'all' or col.handle == 'frontpage' or col.products_count == 0 -%}{%- continue -%}{%- endif -%}
+          {%- if footer_collection_count >= 5 -%}{%- break -%}{%- endif -%}
+          <li><a href="{{ col.url }}">{{ col.title | escape }}</a></li>
+          {%- assign footer_collection_count = footer_collection_count | plus: 1 -%}
+        {%- endfor -%}
+        <li><a href="{{ routes.collections_url }}">Tüm koleksiyonlar</a></li>
+      </ul>
+    </div>
+
+    <div class="editorial-footer__column">
+      {%- if section.settings.newsletter_enable -%}
+        <h2 class="editorial-footer__heading">
+          {{ section.settings.newsletter_heading | default: 'Newsletter' }}
+        </h2>
+        <hr class="editorial-footer__rule">
+        <p class="editorial-footer__statement">{{ section.settings.newsletter_text }}</p>
+        {%- form 'customer', id: 'ContactFooter', class: 'footer__newsletter newsletter-form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="editorial-footer__newsletter-form">
+            <input
+              id="NewsletterForm--{{ section.id }}"
+              class="field__input"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="Mail adresi"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+              required
+            >
+            <button class="button" type="submit">Katıl</button>
+          </div>
+        {%- endform -%}
+      {%- endif -%}
+
+      <div class="editorial-footer__theme">
+        <h2 class="editorial-footer__heading">Tema</h2>
+        <hr class="editorial-footer__rule">
+        <div class="nonewear-theme-toggle" data-nonewear-theme-toggle>
+          <button type="button" data-nonewear-theme-choice="light" aria-pressed="false">Aydınlık</button>
+          <button type="button" data-nonewear-theme-choice="dark" aria-pressed="false">Karanlık</button>
+        </div>
+      </div>
+
+      {%- if section.settings.show_social and has_social_links -%}
+        <div class="editorial-footer__social-wrap">
+          <h2 class="editorial-footer__heading">Social</h2>
+          <hr class="editorial-footer__rule">
+          <ul class="editorial-footer__social">
+            {%- if settings.social_instagram_link != blank -%}
+              <li><a href="{{ settings.social_instagram_link }}">Instagram</a></li>
+            {%- endif -%}
+            {%- if settings.social_facebook_link != blank -%}
+              <li><a href="{{ settings.social_facebook_link }}">Facebook</a></li>
+            {%- endif -%}
+            {%- if settings.social_tiktok_link != blank -%}
+              <li><a href="{{ settings.social_tiktok_link }}">TikTok</a></li>
+            {%- endif -%}
+            {%- if settings.social_youtube_link != blank -%}
+              <li><a href="{{ settings.social_youtube_link }}">YouTube</a></li>
+            {%- endif -%}
+            {%- if settings.social_vimeo_link != blank -%}
+              <li><a href="{{ settings.social_vimeo_link }}">Vimeo</a></li>
+            {%- endif -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+
+  </div>
+
+  <div class="editorial-footer__bottom">
+    <span>© {{ 'now' | date: '%Y' }} <span class="editorial-footer__brand-mark">none wear</span></span>
+    <span>All rights reserved</span>
+  </div>
+</div>
+</footer>
+
+<script>
+  (() => {
+    const root = document.documentElement;
+    const key = 'nonewear-theme';
+    const toggle = document.querySelector('[data-nonewear-theme-toggle]');
+    let storedTheme = null;
+    try {
+      storedTheme = window.localStorage.getItem(key);
+    } catch (error) {
+      storedTheme = null;
+    }
+    const activeTheme =
+      storedTheme === 'dark' || storedTheme === 'light'
+        ? storedTheme
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+
+    function applyTheme(theme, persist) {
+      root.setAttribute('data-nonewear-theme', theme);
+      if (persist) {
+        try {
+          window.localStorage.setItem(key, theme);
+        } catch (error) {}
+      }
+      if (!toggle) return;
+      toggle.querySelectorAll('[data-nonewear-theme-choice]').forEach((button) => {
+        button.setAttribute('aria-pressed', button.dataset.nonewearThemeChoice === theme ? 'true' : 'false');
+      });
+    }
+
+    // Kayıtlı tercih yoksa sistem teması uygulanır ama kalıcılaştırılmaz;
+    // kullanıcı butona basarsa tercih kaydedilir.
+    applyTheme(activeTheme, false);
+
+    if (toggle) {
+      toggle.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-nonewear-theme-choice]');
+        if (!button) return;
+        applyTheme(button.dataset.nonewearThemeChoice, true);
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Footer",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "link_list",
+      "name": "Link list",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "subtext",
+          "label": "Text"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "brand_text",
+      "label": "Marka açıklama metni",
+      "info": "None Wear logosu altında görünür"
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter_enable",
+      "label": "Enable newsletter",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Drop list"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter text",
+      "default": "Yeni drop ve sınırlı stok bilgisini ilk alanlardan ol."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "link_list"
+      },
+      {
+        "type": "link_list"
+      },
+      {
+        "type": "text"
+      }
+    ]
+  }
+}
+{% endschema %}

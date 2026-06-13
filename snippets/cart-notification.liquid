@@ -1,0 +1,35 @@
+<cart-notification>
+  <div
+    id="cart-notification"
+    class="cart-notification"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'general.cart.item_added' | t }}"
+    tabindex="-1"
+  >
+    <div class="cart-notification__header">
+      <span class="cart-notification__heading">
+        ✓ {{ 'general.cart.item_added' | t }}
+      </span>
+      <button type="button" class="cart-notification__close" aria-label="{{ 'accessibility.close' | t }}">✕</button>
+    </div>
+
+    <div id="cart-notification-product" class="cart-notification-product"></div>
+
+    <div class="cart-notification__links">
+      <a
+        href="{{ routes.cart_url }}"
+        id="cart-notification-button"
+        class="button button--secondary button--full-width"
+      >
+        {{- 'general.cart.view_empty_cart' | t -}}
+      </a>
+      <form action="{{ routes.cart_url }}" method="post" id="cart-notification-form">
+        <button class="button button--primary button--full-width" name="checkout">
+          {{ 'sections.cart.checkout' | t }}
+        </button>
+      </form>
+      <button type="button" class="link button-label">{{ 'general.continue_shopping' | t }}</button>
+    </div>
+  </div>
+</cart-notification>

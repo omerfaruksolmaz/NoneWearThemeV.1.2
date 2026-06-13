@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "nonewear-policy-page",
+      "settings": {
+        "content_type": "delivery_returns"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

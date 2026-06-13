@@ -1,0 +1,516 @@
+{%- liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign vendor_filter = nil
+  assign type_filter   = nil
+  assign avail_filter  = nil
+  for filter in collection.filters
+    if filter.param_name == 'filter.p.vendor'
+      assign vendor_filter = filter
+    endif
+    if filter.param_name == 'filter.p.product_type'
+      assign type_filter = filter
+    endif
+    if filter.param_name == 'filter.v.availability' or filter.param_name contains 'availability'
+      assign avail_filter = filter
+    endif
+  endfor
+-%}
+
+{%- if collection.title != blank or collection.description != blank -%}
+  <header class="collection-toolbar__overview page-width">
+    {%- if collection.title != blank -%}
+      <h1 class="collection-toolbar__title">{{ collection.title | escape }}</h1>
+    {%- endif -%}
+    {%- if collection.description != blank -%}
+      <div class="collection-toolbar__description rte">
+        {{ collection.description }}
+      </div>
+    {%- endif -%}
+  </header>
+{%- endif -%}
+
+{%- comment %} ══ DESKTOP FİLTRE ══ {%- endcomment %}
+<div class="nbhd-filter">
+  <form class="nbhd-filter__form" id="NbhdFilterForm" method="get" action="{{ collection.url }}">
+
+    {%- comment %} Kolon 1: BRANDS {%- endcomment %}
+    <div class="nbhd-filter__col">
+      <div class="nbhd-filter__col-title">
+        <a href="{{ collection.url }}">TÜM MARKALAR</a>
+      </div>
+      {%- if vendor_filter != nil -%}
+        <ul class="nbhd-filter__list">
+          {%- for val in vendor_filter.values -%}
+            {%- if val.count == 0 and val.active == false -%}{% continue %}{%- endif -%}
+            <li>
+              <input type="checkbox"
+                id="nbhd-v{{ forloop.index }}"
+                name="{{ val.param_name }}"
+                value="{{ val.value | escape }}"
+                style="display:none"
+                {% if val.active %}checked{% endif %}>
+              <label for="nbhd-v{{ forloop.index }}"
+                class="nbhd-filter__item{% if val.active %} nbhd-filter__item--active{% endif %}"
+                onclick="var i=document.getElementById('nbhd-v{{ forloop.index }}');i.checked=!i.checked;document.getElementById('NbhdFilterForm').submit();">
+                {{- val.label | escape -}}
+              </label>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Kolon 2: CATEGORIES {%- endcomment %}
+    <div class="nbhd-filter__col">
+      <div class="nbhd-filter__col-title">
+        <a href="{{ collection.url }}">TÜM KATEGORİLER</a>
+      </div>
+      {%- if type_filter != nil -%}
+        <ul class="nbhd-filter__list">
+          {%- for val in type_filter.values -%}
+            <li>
+              <input type="checkbox"
+                id="nbhd-t{{ forloop.index }}"
+                name="{{ val.param_name }}"
+                value="{{ val.value | escape }}"
+                style="display:none"
+                {% if val.active %}checked{% endif %}>
+              <label for="nbhd-t{{ forloop.index }}"
+                class="nbhd-filter__item{% if val.active %} nbhd-filter__item--active{% elsif val.count == 0 %} nbhd-filter__item--gray{% endif %}"
+                onclick="var i=document.getElementById('nbhd-t{{ forloop.index }}');i.checked=!i.checked;document.getElementById('NbhdFilterForm').submit();">
+                {{- val.label | escape -}}
+              </label>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        {%- comment %} Shopify storefront filter yoksa ürünlerden topla {%- endcomment %}
+        {%- assign seen_types = '' -%}
+        <ul class="nbhd-filter__list">
+          {%- for p in collection.products -%}
+            {%- if p.type != blank -%}
+              {%- unless seen_types contains p.type -%}
+                {%- assign seen_types = seen_types | append: p.type | append: '|' -%}
+                <li>
+                  <a href="{{ collection.url }}?filter.p.product_type={{ p.type | url_encode }}"
+                     class="nbhd-filter__item">
+                    {{- p.type | escape -}}
+                  </a>
+                </li>
+              {%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    {%- comment %} Kolon 3: SORT + HIDE SOLDOUT + CLEAR {%- endcomment %}
+    <div class="nbhd-filter__col nbhd-filter__col--sort">
+
+      <ul class="nbhd-filter__list">
+        <li>
+          <input type="radio" id="nbhd-s1" name="sort_by" value="manual" style="display:none"
+            {% if sort_by == 'manual' or sort_by == collection.default_sort_by %}checked{% endif %}>
+          <label for="nbhd-s1"
+            class="nbhd-filter__item{% if sort_by == 'manual' or sort_by == collection.default_sort_by %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('nbhd-s1').checked=true;document.getElementById('NbhdFilterForm').submit();">
+            YENİ GELENLER
+          </label>
+        </li>
+        <li>
+          <input type="radio" id="nbhd-s2" name="sort_by" value="price-ascending" style="display:none"
+            {% if sort_by == 'price-ascending' %}checked{% endif %}>
+          <label for="nbhd-s2"
+            class="nbhd-filter__item{% if sort_by == 'price-ascending' %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('nbhd-s2').checked=true;document.getElementById('NbhdFilterForm').submit();">
+            UYGUN FİYAT
+          </label>
+        </li>
+        <li>
+          <input type="radio" id="nbhd-s3" name="sort_by" value="price-descending" style="display:none"
+            {% if sort_by == 'price-descending' %}checked{% endif %}>
+          <label for="nbhd-s3"
+            class="nbhd-filter__item{% if sort_by == 'price-descending' %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('nbhd-s3').checked=true;document.getElementById('NbhdFilterForm').submit();">
+            YÜKSEK FİYAT
+          </label>
+        </li>
+      </ul>
+
+      <div class="nbhd-filter__soldout">
+        {%- if avail_filter != nil -%}
+          {%- for val in avail_filter.values -%}
+            {%- if val.value == '1' -%}
+              <input type="checkbox"
+                id="nbhd-avail"
+                name="{{ val.param_name }}"
+                value="{{ val.value }}"
+                style="display:none"
+                {% if val.active %}checked{% endif %}>
+              <label for="nbhd-avail"
+                class="nbhd-filter__item{% if val.active %} nbhd-filter__item--active{% endif %}"
+                onclick="var i=document.getElementById('nbhd-avail');i.checked=!i.checked;document.getElementById('NbhdFilterForm').submit();">
+                TÜKENENLERİ GİZLE
+              </label>
+              <span class="nbhd-filter__checkbox{% if val.active %} is-on{% endif %}"
+                onclick="var i=document.getElementById('nbhd-avail');i.checked=!i.checked;document.getElementById('NbhdFilterForm').submit();"></span>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          <label class="nbhd-filter__item" id="NbhdSoldOutLabel">TÜKENENLERİ GİZLE</label>
+          <span class="nbhd-filter__checkbox" id="NbhdSoldOutCb"></span>
+        {%- endif -%}
+      </div>
+
+      <div class="nbhd-filter__clear">
+        <a href="{{ collection.url }}">TEMİZLE</a>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{%- comment %} ══ MOBİL FİLTRE ══ {%- endcomment %}
+<div class="nbhd-filter-sp">
+  <button class="nbhd-filter-sp__btn" id="NbhdSpFilterBtn">FİLTRE</button>
+  <button class="nbhd-filter-sp__btn" id="NbhdSpSortBtn">SIRALA</button>
+</div>
+
+{%- comment %} MOBİL FİLTRE PANELİ {%- endcomment %}
+<div class="nbhd-sp-panel" id="NbhdSpFilterPanel">
+  <div class="nbhd-sp-panel__header">
+    <span class="nbhd-sp-panel__title">FİLTRE</span>
+    <button class="nbhd-sp-panel__close" id="NbhdSpFilterClose">&#x2715;</button>
+  </div>
+  <div class="nbhd-sp-panel__body">
+    <form method="get" action="{{ collection.url }}" id="NbhdSpFilterForm">
+
+      {%- if vendor_filter != nil -%}
+        <div class="nbhd-sp-section">MARKA</div>
+        <ul class="nbhd-sp-list">
+          <li><a href="{{ collection.url }}" class="nbhd-sp-item nbhd-sp-item--all">TÜMÜ</a></li>
+          {%- for val in vendor_filter.values -%}
+            {%- if val.count == 0 and val.active == false -%}{% continue %}{%- endif -%}
+            <li>
+              <input type="checkbox" id="spv{{ forloop.index }}"
+                name="{{ val.param_name }}" value="{{ val.value | escape }}"
+                style="display:none" {% if val.active %}checked{% endif %}>
+              <label for="spv{{ forloop.index }}"
+                class="nbhd-sp-item{% if val.active %} nbhd-filter__item--active{% endif %}"
+                onclick="var i=document.getElementById('spv{{ forloop.index }}');i.checked=!i.checked;document.getElementById('NbhdSpFilterForm').submit();">
+                {{- val.label | escape -}}
+              </label>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <div class="nbhd-sp-divider"></div>
+      {%- endif -%}
+
+      {%- if type_filter != nil -%}
+        <div class="nbhd-sp-section">KATEGORİLER</div>
+        <ul class="nbhd-sp-list">
+          <li><a href="{{ collection.url }}" class="nbhd-sp-item nbhd-sp-item--all">TÜMÜ</a></li>
+          {%- for val in type_filter.values -%}
+            <li>
+              <input type="checkbox" id="spt{{ forloop.index }}"
+                name="{{ val.param_name }}" value="{{ val.value | escape }}"
+                style="display:none" {% if val.active %}checked{% endif %}>
+              <label for="spt{{ forloop.index }}"
+                class="nbhd-sp-item{% if val.active %} nbhd-filter__item--active{% endif %}"
+                onclick="var i=document.getElementById('spt{{ forloop.index }}');i.checked=!i.checked;document.getElementById('NbhdSpFilterForm').submit();">
+                {{- val.label | escape -}}
+              </label>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <div class="nbhd-sp-divider"></div>
+      {%- endif -%}
+
+      {%- if avail_filter != nil -%}
+        {%- for val in avail_filter.values -%}
+          {%- if val.value == '1' -%}
+            <div class="nbhd-sp-soldout">
+              <input type="checkbox" id="sp-avail"
+                name="{{ val.param_name }}" value="{{ val.value }}"
+                style="display:none" {% if val.active %}checked{% endif %}>
+              <label for="sp-avail"
+                class="nbhd-sp-item{% if val.active %} nbhd-filter__item--active{% endif %}"
+                onclick="var i=document.getElementById('sp-avail');i.checked=!i.checked;document.getElementById('NbhdSpFilterForm').submit();">
+                TÜKENENLERİ GİZLE
+              </label>
+              <span class="nbhd-filter__checkbox{% if val.active %} is-on{% endif %}"
+                onclick="var i=document.getElementById('sp-avail');i.checked=!i.checked;document.getElementById('NbhdSpFilterForm').submit();"></span>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      <div class="nbhd-sp-clear">
+        <a href="{{ collection.url }}">TEMİZLE</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{%- comment %} MOBİL SORT PANELİ {%- endcomment %}
+<div class="nbhd-sp-panel nbhd-sp-panel--sort" id="NbhdSpSortPanel">
+  <div class="nbhd-sp-panel__header">
+    <span class="nbhd-sp-panel__title">SIRALA</span>
+    <button class="nbhd-sp-panel__close" id="NbhdSpSortClose">&#x2715;</button>
+  </div>
+  <div class="nbhd-sp-panel__body">
+    <form method="get" action="{{ collection.url }}" id="NbhdSpSortForm">
+      {%- if vendor_filter != nil -%}
+        {%- for val in vendor_filter.active_values -%}
+          <input type="hidden" name="{{ val.param_name }}" value="{{ val.value | escape }}">
+        {%- endfor -%}
+      {%- endif -%}
+      {%- if type_filter != nil -%}
+        {%- for val in type_filter.active_values -%}
+          <input type="hidden" name="{{ val.param_name }}" value="{{ val.value | escape }}">
+        {%- endfor -%}
+      {%- endif -%}
+      {%- if avail_filter != nil -%}
+        {%- for val in avail_filter.active_values -%}
+          <input type="hidden" name="{{ val.param_name }}" value="{{ val.value }}">
+        {%- endfor -%}
+      {%- endif -%}
+      <ul class="nbhd-sp-list">
+        <li>
+          <input type="radio" id="sps1" name="sort_by" value="manual" style="display:none"
+            {% if sort_by == 'manual' or sort_by == collection.default_sort_by %}checked{% endif %}>
+          <label for="sps1"
+            class="nbhd-sp-item{% if sort_by == 'manual' or sort_by == collection.default_sort_by %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('sps1').checked=true;document.getElementById('NbhdSpSortForm').submit();">
+            YENİ GELENLER
+          </label>
+        </li>
+        <li>
+          <input type="radio" id="sps2" name="sort_by" value="price-ascending" style="display:none"
+            {% if sort_by == 'price-ascending' %}checked{% endif %}>
+          <label for="sps2"
+            class="nbhd-sp-item{% if sort_by == 'price-ascending' %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('sps2').checked=true;document.getElementById('NbhdSpSortForm').submit();">
+            UYGUN FİYAT
+          </label>
+        </li>
+        <li>
+          <input type="radio" id="sps3" name="sort_by" value="price-descending" style="display:none"
+            {% if sort_by == 'price-descending' %}checked{% endif %}>
+          <label for="sps3"
+            class="nbhd-sp-item{% if sort_by == 'price-descending' %} nbhd-filter__item--active{% endif %}"
+            onclick="document.getElementById('sps3').checked=true;document.getElementById('NbhdSpSortForm').submit();">
+            YÜKSEK FİYAT
+          </label>
+        </li>
+      </ul>
+    </form>
+  </div>
+</div>
+<div class="nbhd-sp-overlay" id="NbhdSpOverlay"></div>
+
+{%- comment %} ══ ÜRÜN GRİDİ ══ {%- endcomment %}
+<div id="collection">
+  {%- paginate collection.products by section.settings.products_per_page -%}
+
+    {%- if collection.products.size == 0 -%}
+      <p style="padding:40px 20px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;">ÜRÜN BULUNAMADI.</p>
+    {%- else -%}
+
+      <div class="collection-list">
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign p = product
+            assign is_sold_out = false
+            if p.available == false
+              assign is_sold_out = true
+            endif
+            assign collab_tag = ''
+            for tag in p.tags
+              if tag contains 'collab:'
+                assign collab_tag = tag | remove_first: 'collab:' | strip
+              endif
+            endfor
+            assign second_media = nil
+            if p.media.size > 1
+              assign second_media = p.media[1]
+            endif
+          -%}
+          <a href="{{ p.url }}" class="collection-list-item{% if is_sold_out %} sold-out{% endif %}">
+            <div class="reveal">
+              {%- if p.featured_media -%}
+                <img
+                  src="{{ p.featured_media | image_url: width: 600 }}"
+                  alt="{{ p.featured_media.alt | default: p.title | escape }}"
+                  loading="{% if forloop.index > 6 %}lazy{% else %}eager{% endif %}"
+                  width="{{ p.featured_media.width }}"
+                  height="{{ p.featured_media.height }}"
+                >
+                {%- if second_media != nil -%}
+                  <img
+                    src="{{ second_media | image_url: width: 600 }}"
+                    class="reveal__hover"
+                    alt="{{ second_media.alt | default: p.title | escape }}"
+                    loading="lazy"
+                    width="{{ second_media.width }}"
+                    height="{{ second_media.height }}"
+                  >
+                {%- endif -%}
+              {%- endif -%}
+              <div class="overlay"></div>
+            </div>
+
+            {%- if collab_tag != '' -%}
+              <span class="product-collaboration">{{ collab_tag }}</span>
+            {%- endif -%}
+
+            <p class="product-type"><span class="vendorname">{{ p.vendor | escape }}</span></p>
+            <p class="product-title">{{ p.title | escape }}</p>
+            <p class="product-price">
+              <span>
+                {%- if p.price_varies -%}{{ p.price_min | money }}{%- else -%}{{ p.price | money }}{%- endif -%}
+              </span>
+              {%- if is_sold_out -%}<span class="product-label">TÜKENDİ</span>{%- endif -%}
+            </p>
+          </a>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <div class="pagination">
+          <div class="pagination-prev">
+            {%- if paginate.previous -%}
+              <a href="{{ paginate.previous.url }}"><span class="prev">GERİ</span></a>
+            {%- else -%}
+              <span class="prev active">GERİ</span>
+            {%- endif -%}
+          </div>
+          <div class="pagination-number">
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <div><a href="{{ part.url }}"><span class="page">{{ part.title }}</span></a></div>
+              {%- else -%}
+                <div><span class="page active">{{ part.title }}</span></div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="pagination-next">
+            {%- if paginate.next -%}
+              <a href="{{ paginate.next.url }}"><span class="next">İLERİ</span></a>
+            {%- else -%}
+              <span class="next active">İLERİ</span>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+<script>
+(function(){
+  var filterBtn  = document.getElementById('NbhdSpFilterBtn');
+  var sortBtn    = document.getElementById('NbhdSpSortBtn');
+  var filterPanel= document.getElementById('NbhdSpFilterPanel');
+  var sortPanel  = document.getElementById('NbhdSpSortPanel');
+  var overlay    = document.getElementById('NbhdSpOverlay');
+  var filterClose= document.getElementById('NbhdSpFilterClose');
+  var sortClose  = document.getElementById('NbhdSpSortClose');
+
+  function open(panel){
+    panel.classList.add('is-open');
+    overlay.classList.add('is-open');
+    document.body.style.overflow='hidden';
+  }
+  function closeAll(){
+    filterPanel.classList.remove('is-open');
+    sortPanel.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.style.overflow='';
+  }
+
+  if(filterBtn)  filterBtn.addEventListener('click', function(){ open(filterPanel); });
+  if(sortBtn)    sortBtn.addEventListener('click',   function(){ open(sortPanel); });
+  if(filterClose)filterClose.addEventListener('click', closeAll);
+  if(sortClose)  sortClose.addEventListener('click',   closeAll);
+  if(overlay)    overlay.addEventListener('click',     closeAll);
+
+  // JS-only HIDE SOLD OUT (filtre yoksa)
+  var label = document.getElementById('NbhdSoldOutLabel');
+  var cb    = document.getElementById('NbhdSoldOutCb');
+  if(label && cb){
+    var on = false;
+    function toggle(){
+      on = !on;
+      cb.classList.toggle('is-on', on);
+      label.classList.toggle('nbhd-filter__item--active', on);
+      document.querySelectorAll('.collection-list-item.sold-out').forEach(function(el){
+        el.style.display = on ? 'none' : '';
+      });
+    }
+    label.addEventListener('click', toggle);
+    cb.addEventListener('click', toggle);
+  }
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Ana Sayfa",
+      "item": {{ request.origin | json }}
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ collection.title | json }},
+      "item": {{ shop.url | append: collection.url | json }}
+    }
+  ]
+}
+</script>
+
+{% schema %}
+{
+  "name": "Collection product grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 12,
+      "max": 60,
+      "step": 6,
+      "label": "Products per page",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 24
+    }
+  ]
+}
+{% endschema %}

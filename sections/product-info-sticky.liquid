@@ -1,0 +1,274 @@
+{% comment %}
+  Standalone editorial sticky info section for product templates.
+{% endcomment %}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- if product != blank -%}
+  <product-info
+    id="StandaloneProductInfo-{{ section.id }}"
+    class="editorial-product-section section-{{ section.id }}-padding"
+    data-section="{{ section.id }}"
+    data-product-id="{{ product.id }}"
+    data-update-url="true"
+    data-url="{{ product.url }}"
+  >
+    {{ 'component-price.css' | asset_url | stylesheet_tag }}
+    {% unless product.has_only_default_variant %}
+      {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+      {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+      {{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+    {% endunless %}
+    <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+    <div class="page-width">
+      {% render 'editorial-product-info', product: product, section: section %}
+    </div>
+  </product-info>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product info sticky",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "Text style",
+          "default": "body",
+          "options": [
+            {
+              "value": "body",
+              "label": "Body"
+            },
+            {
+              "value": "subtitle",
+              "label": "Subtitle"
+            },
+            {
+              "value": "uppercase",
+              "label": "Uppercase"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "inventory",
+      "name": "Inventory",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "label": "Picker type",
+          "default": "button",
+          "options": [
+            {
+              "value": "dropdown",
+              "label": "Dropdown"
+            },
+            {
+              "value": "button",
+              "label": "Buttons"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "swatch_shape",
+          "label": "Swatch shape",
+          "default": "square",
+          "options": [
+            {
+              "value": "circle",
+              "label": "Circle"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "label": "Show dynamic checkout",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_gift_card_recipient",
+          "label": "Show gift card recipient",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1
+    },
+    {
+      "type": "collapsible_tab",
+      "name": "Collapsible tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Liquid"
+        }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "settings": [
+        {
+          "type": "text",
+          "id": "share_label",
+          "label": "Share label",
+          "default": "Share"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_info",
+      "label": "Enable sticky info",
+      "default": true
+    },
+    {
+      "type": "page",
+      "id": "size_guide_page",
+      "label": "Size guide page"
+    },
+    {
+      "type": "text",
+      "id": "size_guide_label",
+      "label": "Size guide label",
+      "default": "Size guide"
+    },
+    {
+      "type": "text",
+      "id": "support_link_label",
+      "label": "Support link label"
+    },
+    {
+      "type": "url",
+      "id": "support_link_url",
+      "label": "Support link URL"
+    },
+    {
+      "type": "text",
+      "id": "delivery_link_label",
+      "label": "Delivery link label"
+    },
+    {
+      "type": "url",
+      "id": "delivery_link_url",
+      "label": "Delivery link URL"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

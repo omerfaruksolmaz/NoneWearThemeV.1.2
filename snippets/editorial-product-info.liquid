@@ -1,0 +1,329 @@
+{% comment %}
+  Shared editorial product info markup.
+{% endcomment %}
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign material_metafield = product.metafields.custom.material
+  if material_metafield == blank
+    assign material_metafield = product.metafields.details.material
+  endif
+
+  assign material_value = blank
+  if material_metafield != blank
+    assign material_value = material_metafield.value | default: material_metafield
+  endif
+-%}
+
+<style>
+  .nw-sticky-atc,
+  .editorial-product__trust-line {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .editorial-product__size-guide--fallback {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .editorial-product-section {
+      padding-bottom: calc(8.8rem + env(safe-area-inset-bottom));
+    }
+
+    .editorial-product__size-guide {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: -0.2rem;
+      color: var(--editorial-ink);
+      text-decoration: underline;
+      text-underline-offset: 0.25rem;
+    }
+
+    .editorial-product__trust {
+      gap: 0.6rem;
+    }
+
+    .editorial-product__trust-line {
+      display: block;
+      color: var(--editorial-ink);
+      font-size: 1rem;
+      line-height: 1.35;
+      letter-spacing: 0.06em;
+    }
+
+    .editorial-product .product-form__input--pill input[type='radio'] + label {
+      min-width: 44px !important;
+      min-height: 44px !important;
+      height: 44px !important;
+      padding: 0 12px !important;
+      border-color: var(--editorial-border) !important;
+      font-size: 10px !important;
+    }
+
+    .editorial-product .product-form__input--pill input[type='radio']:checked + label {
+      background: var(--editorial-ink) !important;
+      color: var(--editorial-bg) !important;
+      border-color: var(--editorial-ink) !important;
+      box-shadow: inset 0 0 0 1px var(--editorial-bg) !important;
+    }
+
+    .editorial-product .product-form__input--pill input[type='radio'].disabled + label,
+    .editorial-product .product-form__input--pill input[type='radio'][disabled] + label {
+      background: var(--editorial-frame) !important;
+      color: var(--editorial-muted) !important;
+      opacity: 0.5 !important;
+      text-decoration: line-through !important;
+    }
+
+    .nw-sticky-atc {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 90;
+      display: grid;
+      grid-template-columns: minmax(7.6rem, auto) minmax(0, 1fr);
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1.2rem calc(0.8rem + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--editorial-border);
+      background: var(--editorial-bg);
+    }
+
+    .nw-sticky-atc__price {
+      min-width: 0;
+      color: var(--editorial-ink);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .nw-sticky-atc__price .price {
+      font-size: inherit;
+      letter-spacing: inherit;
+    }
+
+    .nw-sticky-atc__price .price__container {
+      margin: 0;
+    }
+
+    .nw-sticky-atc__button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--editorial-ink);
+      background: var(--editorial-ink);
+      color: var(--editorial-bg);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .nw-sticky-atc__button[disabled] {
+      border-color: var(--editorial-border);
+      background: var(--editorial-frame);
+      color: var(--editorial-muted);
+      cursor: not-allowed;
+    }
+  }
+</style>
+
+<section
+  id="ProductInfo-{{ section.id }}"
+  class="editorial-product__info product__info-container{% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
+>
+  {%- comment %} NEIGHBORHOOD.JP — vendor / marka etiketi + sold out {%- endcomment %}
+  <div class="editorial-product__brand-row">
+    {%- if product.vendor != blank -%}
+      <span class="editorial-product__vendor">{{ product.vendor | upcase | escape }}</span>
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="editorial-product__sold-out-badge">SOLD OUT</span>
+    {%- endunless -%}
+    {%- if product.tags contains 'coming-soon' or product.tags contains 'coming soon' -%}
+      <span class="editorial-product__coming-soon-badge">COMING SOON</span>
+    {%- endif -%}
+  </div>
+
+  <div class="editorial-product__stack">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when '@app' -%}
+          {% render block %}
+        {%- when 'text' -%}
+          {%- if block.settings.text != blank -%}
+            <p
+              class="{% if block.settings.text_style == 'subtitle' %}editorial-caption{% elsif block.settings.text_style == 'uppercase' %}editorial-meta{% else %}editorial-product__description{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </p>
+          {%- endif -%}
+        {%- when 'title' -%}
+          <h1 class="editorial-product__title" {{ block.shopify_attributes }}>{{ product.title | escape }}</h1>
+        {%- when 'price' -%}
+          <div id="price-{{ section.id }}" class="editorial-product__price" role="status" {{ block.shopify_attributes }}>
+            {% render 'price', product: product, use_variant: true, show_badges: false %}
+          </div>
+        {%- when 'inventory' -%}
+          <p
+            id="Inventory-{{ section.id }}"
+            class="editorial-meta{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} hidden{% endif %}"
+            role="status"
+            {{ block.shopify_attributes }}
+          >
+            {%- if product.selected_or_first_available_variant.inventory_management == 'shopify' -%}
+              {%- if product.selected_or_first_available_variant.available -%}
+                {{ 'products.product.inventory_in_stock' | t }}
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            {%- endif -%}
+          </p>
+        {%- when 'variant_picker' -%}
+          {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+          <a
+            class="editorial-link editorial-product__size-guide{% if section.settings.size_guide_page == blank %} editorial-product__size-guide--fallback{% endif %}"
+            href="{{ section.settings.size_guide_page.url | default: '/pages/size-guide' }}"
+          >
+            {{ section.settings.size_guide_label | default: 'Beden rehberi' | escape }}
+          </a>
+        {%- when 'buy_buttons' -%}
+          {%- render 'buy-buttons',
+            block: block,
+            product: product,
+            product_form_id: product_form_id,
+            section_id: section.id,
+            show_pickup_availability: false
+          -%}
+          <div class="editorial-product__trust">
+            <p class="editorial-product__trust-line">Güvenli ödeme · Kolay iade · Türkiye içi gönderim</p>
+          </div>
+        {%- when 'description' -%}
+          {%- if product.description != blank -%}
+            <div class="editorial-product__description rte" {{ block.shopify_attributes }}>
+              {{ product.description }}
+            </div>
+          {%- endif -%}
+        {%- when 'sku' -%}
+          <p
+            id="Sku-{{ section.id }}"
+            class="editorial-meta{% if product.selected_or_first_available_variant.sku == blank %} hidden{% endif %}"
+            role="status"
+            {{ block.shopify_attributes }}
+          >
+            {{ product.selected_or_first_available_variant.sku }}
+          </p>
+        {%- when 'custom_liquid' -%}
+          {{ block.settings.custom_liquid }}
+        {%- when 'collapsible_tab' -%}
+          <div class="editorial-product__accordion" {{ block.shopify_attributes }}>
+            <details>
+              <summary>
+                <span class="editorial-product__accordion-title">
+                  {{ block.settings.heading | default: block.settings.page.title | escape }}
+                </span>
+                <span class="editorial-meta">+</span>
+              </summary>
+              <div class="editorial-product__accordion-content rte">
+                {{ block.settings.content }}
+                {{ block.settings.page.content }}
+              </div>
+            </details>
+          </div>
+        {%- when 'share' -%}
+          <div class="editorial-product__share" {{ block.shopify_attributes }}>
+            <a class="editorial-link" href="{{ product.url }}">
+              {{ block.settings.share_label | default: 'Share' | escape }}
+            </a>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+
+    {%- if material_value != blank or product.selected_or_first_available_variant.sku != blank or product.type != blank -%}
+      <div class="editorial-product__technical">
+        {%- if product.selected_or_first_available_variant.sku != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Ürün kodu</span>
+            <span>{{ product.selected_or_first_available_variant.sku }}</span>
+          </div>
+        {%- endif -%}
+        {%- if material_value != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Materyal</span>
+            <span>{{ material_value }}</span>
+          </div>
+        {%- endif -%}
+        {%- if product.type != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Kategori</span>
+            <span>{{ product.type | escape }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.support_link_label != blank or section.settings.delivery_link_label != blank -%}
+      <div class="editorial-product__support-links">
+        {%- if section.settings.support_link_label != blank and section.settings.support_link_url != blank -%}
+          <a class="editorial-link" href="{{ section.settings.support_link_url }}">
+            {{ section.settings.support_link_label | escape }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.delivery_link_label != blank and section.settings.delivery_link_url != blank -%}
+          <a class="editorial-link" href="{{ section.settings.delivery_link_url }}">
+            {{ section.settings.delivery_link_label | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- liquid
+    assign sticky_quantity_rule_soldout = false
+    assign sticky_check_against_inventory = true
+    if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
+      assign sticky_check_against_inventory = false
+    endif
+    if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and sticky_check_against_inventory
+      assign sticky_quantity_rule_soldout = true
+    endif
+  -%}
+
+  <div class="nw-sticky-atc" aria-label="Sepete ekle">
+    <div id="NwStickyPrice-{{ section.id }}" class="nw-sticky-atc__price">
+      {% render 'price', product: product, use_variant: true, show_badges: false %}
+    </div>
+    <button
+      type="submit"
+      name="add"
+      form="{{ product_form_id }}"
+      class="nw-sticky-atc__button"
+      data-product-submit
+      data-sticky-product-submit
+      {% if product.selected_or_first_available_variant.available == false
+        or sticky_quantity_rule_soldout
+        or product.selected_or_first_available_variant == null
+      %}
+        disabled
+      {% endif %}
+    >
+      <span>
+        {%- if product.selected_or_first_available_variant == null -%}
+          {{ 'products.product.unavailable' | t }}
+        {%- elsif product.selected_or_first_available_variant.available == false or sticky_quantity_rule_soldout -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- else -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- endif -%}
+      </span>
+    </button>
+  </div>
+</section>

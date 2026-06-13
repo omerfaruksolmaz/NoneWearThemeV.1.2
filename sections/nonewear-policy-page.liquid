@@ -1,0 +1,254 @@
+{% comment %}
+  Static None Wear brand/legal pages for Online Store 2.0 page templates.
+{% endcomment %}
+{%- liquid
+  assign eyebrow = 'None Wear'
+  assign title = 'Hakkımızda'
+  assign summary = 'Hiçlikten gelen stil. Sistem dışı, kalıpsız, bağımsız.'
+  assign anchor_id = 'hakkimizda'
+
+  case section.settings.content_type
+    when 'delivery_returns'
+      assign eyebrow = 'Koşullar'
+      assign title = 'Teslimat ve İade Şartları'
+      assign summary = 'Sipariş, teslimat, iade ve değişim süreçleri.'
+      assign anchor_id = 'teslimat-iade'
+    when 'privacy'
+      assign eyebrow = 'KVKK'
+      assign title = 'Gizlilik Politikası'
+      assign summary = 'Kişisel verilerin işlenmesi, saklanması ve korunması.'
+      assign anchor_id = 'gizlilik-politikasi'
+    when 'distance_sales'
+      assign eyebrow = 'Sözleşme'
+      assign title = 'Mesafeli Satış Sözleşmesi'
+      assign summary = 'www.nonewear.com.tr üzerinden yapılan satışlara ilişkin şartlar.'
+      assign anchor_id = 'mesafeli-satis-sozlesmesi'
+  endcase
+-%}
+
+<section id="{{ anchor_id }}" class="nonewear-policy">
+  <div class="page-width">
+    <div class="nonewear-policy__grid">
+      <aside class="nonewear-policy__aside">
+        <img
+          class="nonewear-policy__symbol"
+          src="{{ 'nonewear-e-logo.png' | asset_url }}"
+          alt=""
+          width="72"
+          height="72"
+          loading="eager"
+        >
+        <div>
+          <p class="editorial-meta">{{ eyebrow }}</p>
+          <h1 class="nonewear-policy__title">{{ title }}</h1>
+          <p class="nonewear-policy__summary">{{ summary }}</p>
+        </div>
+      </aside>
+
+      <div class="nonewear-policy__content rte">
+        {%- case section.settings.content_type -%}
+          {%- when 'about' -%}
+            <h2>Marka Temeli</h2>
+            <p><strong>None Wear</strong>, hiçlikten gelen stil fikri üzerine kuruldu: sistem dışı, kalıpsız ve bağımsız.</p>
+            <p>Gotik, street ve skate kültürünü sade ama sert bir görsel dille birleştirir. Trend takip etmez, kendi ritmini üretir.</p>
+
+            <h2>Duruş</h2>
+            <p>Kural yok. Sistem dışı. Giy ve kaybol.</p>
+            <p>Bu bir marka değil, sokaktan çıkanların kolektif duruşu. Siyah ağırlıklı, az ama karakterli parçalar üretir.</p>
+
+            <h2>Ürün Yaklaşımı</h2>
+            <ul>
+              <li>Oversize hoodie, tee ve sweat odağı</li>
+              <li>Sınırlı stok ve drop sistemi</li>
+              <li>Yüksek kontrast siyah-beyaz kimlik</li>
+              <li>Ürün odaklı, sade ve sert sunum</li>
+            </ul>
+
+            <h2>İletişim</h2>
+            <p>E-posta: <a href="mailto:destek@nonewear.com.tr">destek@nonewear.com.tr</a></p>
+            <p>Adres: İstanbul / Sultangazi, 50. Yıl Mahallesi</p>
+
+          {%- when 'delivery_returns' -%}
+            <h2>1. Sipariş İptali</h2>
+            <p>Siparişler, kargoya verilmeden önce iptal edilebilir. Kargoya verildikten sonra iptal işlemi yapılamaz.</p>
+            <p>Eğer ürünün teslimi, tarafımızdan kaynaklanan sebeplerle belirtilen süre içerisinde gerçekleştirilemezse sipariş iptal edilebilir.</p>
+
+            <h2>2. İade ve Değişim Koşulları</h2>
+            <p>Ürünlerimiz kalite kontrol süreçlerinden geçmektedir. Aşağıdaki durumlarda iade veya değişim yapılmaktadır:</p>
+            <ul>
+              <li>Ürünün hasarlı veya kusurlu olması</li>
+              <li>Yanlış ürün gönderimi yapılması</li>
+            </ul>
+            <p>Bu durumlarda kargo dahil tüm masraflar firmamıza aittir.</p>
+
+            <h2>3. İade / Değişim Süreci</h2>
+            <p>Ürün teslim alındıktan sonra <strong>7 gün içerisinde</strong> bizimle iletişime geçilmelidir.</p>
+            <p>Talebiniz alındıktan sonra süreç hakkında bilgilendirme e-posta veya telefon yoluyla yapılır.</p>
+            <p>İade edilecek ürün:</p>
+            <ul>
+              <li>Orijinal paketinde olmalı</li>
+              <li>Kullanılmamış olmalı</li>
+              <li>Tüm etiket ve aksesuarları eksiksiz olmalıdır</li>
+            </ul>
+
+            <h2>4. İade Edilemeyen Durumlar</h2>
+            <ul>
+              <li>Teslimden itibaren 7 günü geçmiş ürünler</li>
+              <li>Kullanılmış veya zarar görmüş ürünler</li>
+              <li>Etiket, kutu veya aksesuarı eksik ürünler</li>
+              <li>Kullanıcı kaynaklı değişiklik yapılmış ürünler</li>
+            </ul>
+
+            <h2>5. Ürün Bilgilendirmesi</h2>
+            <p>Tüm ürünlerimiz kalite standartlarına uygun şekilde satışa sunulmaktadır. Kumaş yapısından kaynaklanan küçük farklılıklar kusur olarak değerlendirilmez.</p>
+
+            <h2>6. İletişim</h2>
+            <p>E-posta: <a href="mailto:destek@nonewear.com.tr">destek@nonewear.com.tr</a></p>
+            <p>Şirket: None Wear</p>
+            <p>Adres: İstanbul / Sultangazi, 50. Yıl Mahallesi</p>
+
+          {%- when 'privacy' -%}
+            <h2>1. Veri Sorumlusu</h2>
+            <p>İşbu Gizlilik Politikası, None Wear tarafından, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) kapsamında, www.nonewear.com.tr üzerinden sunulan hizmetler sırasında elde edilen kişisel verilerin işlenmesine ilişkin esasları açıklamak amacıyla hazırlanmıştır.</p>
+
+            <h2>2. Toplanan Kişisel Veriler</h2>
+            <p>Şirketimiz, aşağıdaki kişisel verilerinizi işleyebilir:</p>
+            <ul>
+              <li>Ad, soyad</li>
+              <li>E-posta adresi</li>
+              <li>Telefon numarası</li>
+              <li>Adres bilgileri</li>
+              <li>Sipariş ve fatura bilgileri</li>
+              <li>Ödeme bilgileri (ödeme altyapısı aracılığıyla)</li>
+              <li>IP adresi ve site kullanım verileri</li>
+            </ul>
+
+            <h2>3. Kişisel Verilerin Toplanma Yöntemi</h2>
+            <p>Kişisel verileriniz siteye üyelik oluştururken, sipariş verirken, iletişim formlarını doldururken ve çerezler aracılığıyla otomatik veya otomatik olmayan yollarla toplanabilir.</p>
+
+            <h2>4. Kişisel Verilerin İşlenme Amaçları</h2>
+            <ul>
+              <li>Siparişlerin alınması ve teslim edilmesi</li>
+              <li>Ödeme işlemlerinin gerçekleştirilmesi</li>
+              <li>Müşteri hizmetleri desteği sağlanması</li>
+              <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+              <li>Pazarlama ve kampanya süreçlerinin yürütülmesi (onayınız olması halinde)</li>
+            </ul>
+
+            <h2>5. Kişisel Verilerin Aktarılması</h2>
+            <ul>
+              <li>Ödeme işlemleri için: iyzico</li>
+              <li>Kargo ve teslimat için: anlaşmalı kargo firmaları</li>
+              <li>Altyapı hizmetleri için: Shopify</li>
+              <li>Yasal zorunluluklar kapsamında yetkili kamu kurumları</li>
+            </ul>
+
+            <h2>6. Ödeme Güvenliği</h2>
+            <p>Ödeme işlemleri, güvenli ödeme altyapısı sağlayıcıları aracılığıyla gerçekleştirilmektedir. Kredi kartı bilgileriniz tarafımızca saklanmaz ve doğrudan ilgili ödeme kuruluşuna iletilir.</p>
+
+            <h2>7. Çerezler</h2>
+            <p>Sitemizde kullanıcı deneyimini geliştirmek amacıyla çerezler kullanılmaktadır. Çerezleri tarayıcı ayarlarınızdan kontrol edebilir veya silebilirsiniz.</p>
+
+            <h2>8. Veri Saklama Süresi</h2>
+            <p>Kişisel verileriniz, işlenme amacının gerektirdiği süre boyunca ve ilgili mevzuatta öngörülen süreler kadar saklanır.</p>
+
+            <h2>9. Veri Sahibinin Hakları</h2>
+            <p>KVKK’nın 11. maddesi kapsamında kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, düzeltme veya silme talep etme ve işlenmeye itiraz etme haklarına sahipsiniz.</p>
+
+            <h2>10. İletişim</h2>
+            <p>Şirket: None Wear</p>
+            <p>E-posta: <a href="mailto:destek@nonewear.com.tr">destek@nonewear.com.tr</a></p>
+            <p>Adres: İstanbul / Sultangazi, 50. Yıl Mahallesi</p>
+
+            <h2>11. Güncellemeler</h2>
+            <p>None Wear, işbu Gizlilik Politikası üzerinde gerekli gördüğü değişiklikleri yapma hakkını saklı tutar. Güncel metin, site üzerinde yayınlandığı tarihte yürürlüğe girer.</p>
+
+          {%- when 'distance_sales' -%}
+            <h2>1. Taraflar</h2>
+            <p>İşbu Mesafeli Satış Sözleşmesi (“Sözleşme”), aşağıda bilgileri bulunan satıcı ile tüketici arasında elektronik ortamda kurulmuştur.</p>
+            <p><strong>Satıcı (Şirket):</strong> None Wear<br><strong>E-posta:</strong> destek@nonewear.com.tr<br><strong>Adres:</strong> İstanbul / Sultangazi, 50. Yıl Mahallesi<br><strong>Web Sitesi:</strong> www.nonewear.com.tr</p>
+            <p>Alıcı, www.nonewear.com.tr üzerinden sipariş oluşturan gerçek veya tüzel kişidir.</p>
+
+            <h2>2. Konu</h2>
+            <p>İşbu sözleşmenin konusu, alıcının satıcıya ait internet sitesi üzerinden sipariş verdiği ürünlerin satışı ve teslimine ilişkin hak ve yükümlülüklerin belirlenmesidir.</p>
+
+            <h2>3. Ürün Bilgileri</h2>
+            <p>Sipariş edilen ürün veya ürünler, miktar, fiyat ve ödeme bilgileri sipariş esnasında alıcı tarafından onaylanan sipariş özeti içinde yer almaktadır.</p>
+
+            <h2>4. Ödeme ve Teslimat</h2>
+            <ul>
+              <li>Ödeme işlemleri güvenli ödeme altyapısı üzerinden gerçekleştirilir. iyzico ile ödeme desteklenir.</li>
+              <li>Siparişler, stok durumuna göre en kısa sürede kargoya verilir.</li>
+              <li>Teslimat, alıcının belirttiği adrese kargo firması aracılığıyla yapılır.</li>
+            </ul>
+
+            <h2>5. Cayma Hakkı</h2>
+            <p>Alıcı, ürünü teslim aldığı tarihten itibaren <strong>14 gün içinde</strong> herhangi bir gerekçe göstermeksizin cayma hakkını kullanabilir.</p>
+            <p>Cayma hakkı kapsamında ürün kullanılmamış olmalı; orijinal ambalajı ve aksesuarları eksiksiz olmalıdır.</p>
+
+            <h2>6. Cayma Hakkının Kullanımı</h2>
+            <p>Cayma hakkı kullanmak isteyen alıcı, bu süre içinde satıcıya yazılı olarak veya e-posta yoluyla bildirimde bulunmalıdır. İade edilen ürün satıcıya ulaştıktan sonra, ürün bedeli alıcıya iade edilir.</p>
+
+            <h2>7. Cayma Hakkının Kullanılamayacağı Durumlar</h2>
+            <ul>
+              <li>Kullanılmış veya zarar görmüş ürünler</li>
+              <li>Hijyen açısından iadesi uygun olmayan ürünler</li>
+              <li>Ambalajı açılmış ve tekrar satılabilirliği bozulmuş ürünler</li>
+              <li>Teslimden sonra kişisel kullanım sonucu değiştirilen ürünler</li>
+            </ul>
+
+            <h2>8. Sorumluluk</h2>
+            <p>Satıcı, sipariş edilen ürünün ayıpsız ve sözleşmeye uygun şekilde tesliminden sorumludur.</p>
+
+            <h2>9. Mücbir Sebepler</h2>
+            <p>Doğal afet, savaş, grev, kargo aksaklığı gibi durumlarda teslimat süresi uzayabilir. Bu durumlarda satıcı sorumlu tutulamaz.</p>
+
+            <h2>10. Uyuşmazlık Çözümü</h2>
+            <p>İşbu sözleşmeden doğan uyuşmazlıklarda Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir.</p>
+
+            <h2>11. Yürürlük</h2>
+            <p>Alıcı, siparişi tamamladığında işbu sözleşmenin tüm koşullarını kabul etmiş sayılır.</p>
+        {%- endcase -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "None Wear policy page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "content_type",
+      "label": "Content type",
+      "default": "about",
+      "options": [
+        {
+          "value": "about",
+          "label": "About"
+        },
+        {
+          "value": "delivery_returns",
+          "label": "Delivery and returns"
+        },
+        {
+          "value": "privacy",
+          "label": "Privacy"
+        },
+        {
+          "value": "distance_sales",
+          "label": "Distance sales"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "None Wear policy page"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,138 @@
+{% comment %}
+  NONEWEAR — Minimal editorial ürün kartı (NEIGHBORHOOD.JP tarzı)
+
+  Kabul eder:
+  - card_product: Product object
+  - show_vendor: Boolean
+  - show_product_type: Boolean
+  - lazy_load: Boolean
+  - media_ratio: String (örn: '4 / 5')
+{% endcomment %}
+{%- if card_product and card_product != blank -%}
+  {%- liquid
+    assign meta_text = 'none wear'
+    if show_vendor and card_product.vendor != blank
+      assign meta_text = card_product.vendor
+    elsif show_product_type and card_product.type != blank
+      assign meta_text = card_product.type
+    endif
+
+    # Marka adı yazıyorsa Blankenburg (marka fontu) ile gösterilir
+    assign meta_is_brand = false
+    assign meta_check = meta_text | downcase | strip
+    if meta_check == 'none wear' or meta_check == 'nonewear'
+      assign meta_is_brand = true
+    endif
+
+    assign featured_media = card_product.featured_media | default: card_product.media.first
+
+    assign card_price = card_product.price
+    if card_product.price_varies
+      assign card_price = card_product.price_min
+    endif
+
+    assign is_sold_out = false
+    if card_product.available == false
+      assign is_sold_out = true
+    endif
+
+    assign is_coming_soon = false
+    if card_product.tags contains 'coming-soon' or card_product.tags contains 'coming soon' or card_product.tags contains 'COMING SOON'
+      assign is_coming_soon = true
+    endif
+
+    assign image_loading = 'lazy'
+    if lazy_load == false
+      assign image_loading = 'eager'
+    endif
+
+    assign image_sizes = '(min-width: 1200px) calc((100vw - 8rem) / 6), (min-width: 990px) calc((100vw - 7rem) / 5), (min-width: 750px) calc((100vw - 4rem) / 3), calc((100vw - 2.4rem) / 2)'
+    assign image_alt = featured_media.alt | default: card_product.title | escape
+    assign media_count = card_product.media.size
+  -%}
+
+  <article
+    class="product-card-minimal{% if is_sold_out %} product-card-minimal--sold-out{% endif %}"
+    data-media-count="{{ media_count }}"
+  >
+    <a class="product-card-minimal__link" href="{{ card_product.url }}">
+      <div class="product-card-minimal__media" style="--card-media-ratio: {{ media_ratio | default: '4 / 5' }};">
+
+        {%- if featured_media -%}
+          <div class="product-card-minimal__image-stack" data-hover-images>
+
+            {%- comment %} Ana görsel {%- endcomment %}
+            {{
+              featured_media
+              | image_url: width: 900
+              | image_tag:
+                class: 'product-card-minimal__image product-card-minimal__image--primary',
+                loading: image_loading,
+                widths: '180, 280, 360, 540, 720, 900',
+                sizes: image_sizes,
+                alt: image_alt
+            }}
+
+            {%- comment %}
+              Alternatif görseller (hover için — ilk 4 tanesi).
+              src yok: nonewear.js fare karta ilk geldiğinde data-src'den yükler;
+              mobil/dokunmatik cihazlar bu görselleri hiç indirmez.
+            {%- endcomment %}
+            {%- if show_secondary_image -%}
+              {%- assign alt_index = 0 -%}
+              {%- for media in card_product.media -%}
+                {%- if forloop.first -%}{% continue %}{%- endif -%}
+                {%- if alt_index >= 4 -%}{% break %}{%- endif -%}
+                <img
+                  class="product-card-minimal__image product-card-minimal__image--alt"
+                  data-src="{{ media | image_url: width: 900 }}"
+                  data-srcset="{{ media | image_url: width: 180 }} 180w, {{ media | image_url: width: 360 }} 360w, {{ media | image_url: width: 540 }} 540w, {{ media | image_url: width: 720 }} 720w, {{ media | image_url: width: 900 }} 900w"
+                  sizes="{{ image_sizes }}"
+                  decoding="async"
+                  alt="{{ media.alt | default: card_product.title | escape }}"
+                  data-index="{{ alt_index }}"
+                  width="{{ media.width }}"
+                  height="{{ media.height }}"
+                >
+                {%- assign alt_index = alt_index | plus: 1 -%}
+              {%- endfor -%}
+            {%- endif -%}
+
+          </div>
+        {%- else -%}
+          <span class="product-card-minimal__placeholder">{{ card_product.title | escape }}</span>
+        {%- endif -%}
+
+        {%- comment %} Rozet {%- endcomment %}
+        {%- if is_sold_out -%}
+          <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
+        {%- elsif is_coming_soon -%}
+          <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>
+        {%- elsif card_product.compare_at_price_max > card_product.price -%}
+          <span class="product-card-minimal__badge product-card-minimal__badge--sale">SALE</span>
+        {%- endif -%}
+
+      </div>
+
+      <div class="product-card-minimal__body">
+        <div class="product-card-minimal__meta{% if meta_is_brand %} product-card-minimal__meta--brand{% endif %}">{{ meta_text | escape }}</div>
+        <div class="product-card-minimal__title">{{ card_product.title | escape }}</div>
+        <div class="product-card-minimal__price-row">
+          {%- if is_sold_out -%}
+            <span class="product-card-minimal__price-value">{{ card_price | money }}</span>
+            <span class="product-card-minimal__status">SOLD OUT</span>
+          {%- elsif is_coming_soon -%}
+            <span class="product-card-minimal__status">COMING SOON</span>
+          {%- else -%}
+            <span class="product-card-minimal__price-value">{{ card_price | money }}</span>
+            {%- if card_product.compare_at_price_max > card_product.price -%}
+              <span class="product-card-minimal__compare">{{ card_product.compare_at_price_max | money }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+    </a>
+  </article>
+
+{%- endif -%}

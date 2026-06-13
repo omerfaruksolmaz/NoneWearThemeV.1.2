@@ -1,0 +1,340 @@
+{% comment %}
+  NONEWEAR — Collection toolbar
+  • Üst şerit: başlık + metrik sayılar
+  • Alt şerit: filtre dropdown'ları + sıralama
+{% endcomment %}
+{%- liquid
+  assign active_filter_count = 0
+  for filter in collection.filters
+    assign active_filter_count = active_filter_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != blank or filter.max_value.value != blank
+        assign active_filter_count = active_filter_count | plus: 1
+      endif
+    endif
+  endfor
+
+  assign in_stock_count   = 0
+  assign out_stock_count  = 0
+  assign price_range_max  = blank
+  assign size_filter      = blank
+  assign color_filter     = blank
+
+  for filter in collection.filters
+    if filter.type == 'price_range'
+      assign price_range_max = filter.range_max | money_without_trailing_zeros
+    endif
+    for val in filter.values
+      if val.label == 'Stokta' or val.label == 'In stock'
+        assign in_stock_count = val.count
+      endif
+      if val.label == 'Stokta yok' or val.label == 'Out of stock'
+        assign out_stock_count = val.count
+      endif
+    endfor
+    if filter.label == 'Beden' or filter.label == 'Size'
+      assign size_filter = filter
+    endif
+    if filter.label == 'Renk' or filter.label == 'Color' or filter.label == 'Colour'
+      assign color_filter = filter
+    endif
+  endfor
+-%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="nw-toolbar section-{{ section.id }}-padding" id="NwToolbar">
+
+  {%- comment %} ── ÜST ŞERİT: başlık + metrikler ── {%- endcomment %}
+  <div class="nw-toolbar__top">
+
+    <div class="nw-toolbar__title-block">
+      {%- if section.settings.show_breadcrumbs -%}
+        <nav class="nw-toolbar__breadcrumb" aria-label="Breadcrumb">
+          <a href="{{ routes.root_url }}">HOME</a>
+          <span>/</span>
+          <span>{{ collection.title | upcase | escape }}</span>
+        </nav>
+      {%- endif -%}
+      <h1 class="nw-toolbar__title">{{ collection.title | upcase | escape }}</h1>
+    </div>
+
+    <div class="nw-toolbar__metrics">
+
+      {%- if section.settings.show_product_count -%}
+        <div class="nw-toolbar__metric">
+          <span class="nw-toolbar__metric-value" id="ProductCount">{{ collection.products_count }}</span>
+          <span class="nw-toolbar__metric-label">ÜRÜN</span>
+        </div>
+      {%- endif -%}
+
+      {%- if in_stock_count > 0 or out_stock_count > 0 -%}
+        <div class="nw-toolbar__metric nw-toolbar__metric--available">
+          <span class="nw-toolbar__metric-value">{{ in_stock_count }}</span>
+          <span class="nw-toolbar__metric-label">STOKTA</span>
+        </div>
+        <div class="nw-toolbar__metric nw-toolbar__metric--soldout">
+          <span class="nw-toolbar__metric-value">{{ out_stock_count }}</span>
+          <span class="nw-toolbar__metric-label">STOKTA YOK</span>
+        </div>
+      {%- endif -%}
+
+      {%- if price_range_max != blank -%}
+        <div class="nw-toolbar__metric">
+          <span class="nw-toolbar__metric-value">{{ price_range_max }}</span>
+          <span class="nw-toolbar__metric-label">MAX FİYAT</span>
+        </div>
+      {%- endif -%}
+
+      {%- if active_filter_count > 0 -%}
+        <div class="nw-toolbar__metric nw-toolbar__metric--active">
+          <span class="nw-toolbar__metric-value">{{ active_filter_count }}</span>
+          <span class="nw-toolbar__metric-label">AKTİF FİLTRE</span>
+        </div>
+        <a
+          class="nw-toolbar__clear"
+          href="{{ collection.url }}{% if collection.sort_by != blank %}?sort_by={{ collection.sort_by | url_escape }}{% endif %}"
+          aria-label="Filtreleri temizle"
+        >TEMIZLE ✕</a>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {%- comment %} ── AKTIF FİLTRE ROZETLERİ ── {%- endcomment %}
+  {%- if active_filter_count > 0 -%}
+    <div class="nw-toolbar__active-filters">
+      {%- for filter in collection.filters -%}
+        {%- for val in filter.active_values -%}
+          <a class="nw-toolbar__active-tag" href="{{ val.url_to_remove }}">
+            {{ val.label | escape }} ✕
+          </a>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != blank or filter.max_value.value != blank -%}
+            <a class="nw-toolbar__active-tag" href="{{ filter.url_to_remove }}">
+              Fiyat: {{ filter.min_value.value | default: 0 | money_without_trailing_zeros }} – {{ filter.max_value.value | default: filter.range_max | money_without_trailing_zeros }} ✕
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment %} ── FİLTRE + SIRALAMA ŞERİDİ ── {%- endcomment %}
+  {%- if section.settings.show_filters or section.settings.show_sort -%}
+    <div class="nw-toolbar__bar">
+
+      {%- if section.settings.show_filters -%}
+        <div class="nw-toolbar__filters">
+
+          {%- for filter in collection.filters -%}
+            {%- assign filter_active = false -%}
+            {%- if filter.active_values.size > 0 -%}
+              {%- assign filter_active = true -%}
+            {%- elsif filter.type == 'price_range' and filter.min_value.value != blank -%}
+              {%- assign filter_active = true -%}
+            {%- elsif filter.type == 'price_range' and filter.max_value.value != blank -%}
+              {%- assign filter_active = true -%}
+            {%- endif -%}
+
+            <details class="nw-filter-group{% if filter_active %} is-active{% endif %}" data-filter-group>
+              <summary class="nw-filter-group__trigger">
+                <span class="nw-filter-group__label">{{ filter.label | upcase | escape }}</span>
+                {%- if filter.active_values.size > 0 -%}
+                  <span class="nw-filter-group__badge">{{ filter.active_values.size }}</span>
+                {%- endif -%}
+                <span class="nw-filter-group__arrow" aria-hidden="true">&#9662;</span>
+              </summary>
+
+              <div class="nw-filter-group__dropdown">
+                {%- case filter.type -%}
+
+                  {%- when 'list', 'boolean' -%}
+                    <ul class="nw-filter-group__list" role="list">
+                      {%- for val in filter.values -%}
+                        {%- if val.count == 0 and val.active == false -%}{% continue %}{%- endif -%}
+                        <li class="nw-filter-group__item">
+                          <a
+                            class="nw-filter-group__link{% if val.active %} is-active{% endif %}{% if val.count == 0 %} is-disabled{% endif %}"
+                            href="{% if val.active %}{{ val.url_to_remove }}{% else %}{{ val.url_to_add }}{% endif %}"
+                          >
+                            <span class="nw-filter-group__link-label">{{ val.label | escape }}</span>
+                            <span class="nw-filter-group__link-count">{{ val.count }}</span>
+                            {%- if val.active -%}<span class="nw-filter-group__check" aria-hidden="true">✓</span>{%- endif -%}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+
+                  {%- when 'price_range' -%}
+                    <form class="nw-filter-group__price-form" method="get" action="{{ collection.url }}">
+                      {%- if collection.sort_by != blank -%}
+                        <input type="hidden" name="sort_by" value="{{ collection.sort_by | escape }}">
+                      {%- endif -%}
+                      {%- for af in collection.filters -%}
+                        {%- if af.type == 'price_range' and af.param_name == filter.param_name -%}
+                          {% continue %}
+                        {%- elsif af.type == 'price_range' -%}
+                          {%- if af.min_value.value != blank -%}
+                            <input type="hidden" name="{{ af.min_value.param_name }}" value="{{ af.min_value.value | money_without_currency }}">
+                          {%- endif -%}
+                          {%- if af.max_value.value != blank -%}
+                            <input type="hidden" name="{{ af.max_value.param_name }}" value="{{ af.max_value.value | money_without_currency }}">
+                          {%- endif -%}
+                        {%- else -%}
+                          {%- for av in af.active_values -%}
+                            <input type="hidden" name="{{ av.param_name }}" value="{{ av.value }}">
+                          {%- endfor -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                      <div class="nw-filter-group__price-row">
+                        <div class="nw-filter-group__price-field">
+                          <label class="nw-filter-group__price-label">MIN</label>
+                          <input
+                            class="nw-filter-group__price-input"
+                            type="text"
+                            inputmode="decimal"
+                            name="{{ filter.min_value.param_name }}"
+                            value="{% if filter.min_value.value != blank %}{{ filter.min_value.value | money_without_currency }}{% endif %}"
+                            placeholder="0"
+                          >
+                        </div>
+                        <span class="nw-filter-group__price-sep">—</span>
+                        <div class="nw-filter-group__price-field">
+                          <label class="nw-filter-group__price-label">MAX</label>
+                          <input
+                            class="nw-filter-group__price-input"
+                            type="text"
+                            inputmode="decimal"
+                            name="{{ filter.max_value.param_name }}"
+                            value="{% if filter.max_value.value != blank %}{{ filter.max_value.value | money_without_currency }}{% endif %}"
+                            placeholder="{{ filter.range_max | money_without_currency }}"
+                          >
+                        </div>
+                      </div>
+                      <button class="nw-filter-group__price-submit" type="submit">UYGULA</button>
+                    </form>
+
+                {%- endcase -%}
+              </div>
+            </details>
+          {%- endfor -%}
+
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_sort -%}
+        <div class="nw-toolbar__sort">
+          <form class="nw-toolbar__sort-form" method="get" action="{{ collection.url }}">
+            {%- for filter in collection.filters -%}
+              {%- if filter.type == 'price_range' -%}
+                {%- if filter.min_value.value != blank -%}
+                  <input type="hidden" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency }}">
+                {%- endif -%}
+                {%- if filter.max_value.value != blank -%}
+                  <input type="hidden" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency }}">
+                {%- endif -%}
+              {%- else -%}
+                {%- for av in filter.active_values -%}
+                  <input type="hidden" name="{{ av.param_name }}" value="{{ av.value }}">
+                {%- endfor -%}
+              {%- endif -%}
+            {%- endfor -%}
+            <label class="nw-toolbar__sort-label" for="NwSortBy">SIRALA</label>
+            {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+            <select class="nw-toolbar__sort-select" id="NwSortBy" name="sort_by" onchange="this.form.submit()">
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
+                  {{ option.name | escape }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </form>
+        </div>
+      {%- endif -%}
+
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+  // Dropdown dışına tıklayınca kapat
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('[data-filter-group]')) {
+      document.querySelectorAll('[data-filter-group][open]').forEach(function(el) {
+        el.removeAttribute('open');
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection toolbar",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show filters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show sorting",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}
