@@ -39,6 +39,7 @@
 
           {%- if media.media_type == 'image' -%}
             {%- assign full_url = media | image_url: width: 3000 -%}
+            {%- assign lightbox_url = media | image_url: width: 1800 -%}
             <div
               class="nw-magnifier-frame nw-product-gallery__frame nw-lightbox-trigger"
               role="button"
@@ -54,6 +55,7 @@
                 loading="{{ img_loading }}"
                 alt="{{ media.alt | default: product.title | escape }}"
                 data-full="{{ full_url }}"
+                data-lightbox-src="{{ lightbox_url }}"
                 width="{{ media.width }}"
                 height="{{ media.height }}"
               >

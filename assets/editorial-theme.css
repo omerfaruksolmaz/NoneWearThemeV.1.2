@@ -2737,14 +2737,49 @@ html[data-nonewear-theme='dark'] .nbhd-header__logo-img--dark {
 }
 
 .nbhd-lightbox__img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   max-width: 90vw;
   max-height: 88vh;
   object-fit: contain;
   cursor: zoom-in;
   transform-origin: center center;
-  transition: transform 0.3s ease;
+  transform: translate(-50%, -50%) translateX(var(--nw-lightbox-x, 0)) scale(var(--nw-lightbox-scale, 1));
+  transition: transform 0.2s ease;
   user-select: none;
   -webkit-user-drag: none;
+  will-change: transform;
+}
+
+.nbhd-lightbox__img--incoming {
+  pointer-events: none;
+}
+
+.nbhd-lightbox__img.is-from-next {
+  --nw-lightbox-x: 100vw;
+}
+
+.nbhd-lightbox__img.is-from-prev {
+  --nw-lightbox-x: -100vw;
+}
+
+.nbhd-lightbox__img--incoming.is-active {
+  --nw-lightbox-x: 0;
+}
+
+.nbhd-lightbox__img.is-to-prev.is-leaving {
+  --nw-lightbox-x: -100vw;
+}
+
+.nbhd-lightbox__img.is-to-next.is-leaving {
+  --nw-lightbox-x: 100vw;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nbhd-lightbox__img {
+    transition: none;
+  }
 }
 
 .nbhd-lightbox__img.is-zoomed {
