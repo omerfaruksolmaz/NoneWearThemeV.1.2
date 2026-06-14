@@ -171,6 +171,56 @@
 </div>
 
 {%- comment %} ══ MOBİL FİLTRE ══ {%- endcomment %}
+{%- liquid
+  assign has_active_collection_filters = false
+  if vendor_filter != nil
+    for val in vendor_filter.active_values
+      assign has_active_collection_filters = true
+    endfor
+  endif
+  if type_filter != nil
+    for val in type_filter.active_values
+      assign has_active_collection_filters = true
+    endfor
+  endif
+  if avail_filter != nil
+    for val in avail_filter.active_values
+      assign has_active_collection_filters = true
+    endfor
+  endif
+-%}
+
+{%- if has_active_collection_filters -%}
+  <div class="nbhd-active-filters page-width" aria-label="Aktif filtreler">
+    <span class="nbhd-active-filters__label">ACTIVE FILTERS</span>
+    {%- if vendor_filter != nil -%}
+      {%- for val in vendor_filter.active_values -%}
+        <a href="{{ val.url_to_remove }}" class="nbhd-active-filters__chip">
+          <span>{{ val.label | escape }}</span>
+          <span aria-hidden="true">x</span>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+    {%- if type_filter != nil -%}
+      {%- for val in type_filter.active_values -%}
+        <a href="{{ val.url_to_remove }}" class="nbhd-active-filters__chip">
+          <span>{{ val.label | escape }}</span>
+          <span aria-hidden="true">x</span>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+    {%- if avail_filter != nil -%}
+      {%- for val in avail_filter.active_values -%}
+        <a href="{{ val.url_to_remove }}" class="nbhd-active-filters__chip">
+          <span>{{ val.label | escape }}</span>
+          <span aria-hidden="true">x</span>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+    <a href="{{ collection.url }}" class="nbhd-active-filters__clear">CLEAR ALL</a>
+  </div>
+{%- endif -%}
+
 <div class="nbhd-filter-sp">
   <button class="nbhd-filter-sp__btn" id="NbhdSpFilterBtn">FİLTRE</button>
   <button class="nbhd-filter-sp__btn" id="NbhdSpSortBtn">SIRALA</button>
@@ -329,6 +379,18 @@
             if p.tags contains 'coming-soon' or p.tags contains 'coming soon' or p.tags contains 'COMING SOON'
               assign is_coming_soon = true
             endif
+            assign is_new_drop = false
+            if p.tags contains 'new-drop' or p.tags contains 'new drop' or p.tags contains 'NEW DROP'
+              assign is_new_drop = true
+            endif
+            assign is_restock = false
+            if p.tags contains 'restock' or p.tags contains 'RESTOCK'
+              assign is_restock = true
+            endif
+            assign is_last_pieces = false
+            if p.tags contains 'last-pieces' or p.tags contains 'last pieces' or p.tags contains 'LAST PIECES'
+              assign is_last_pieces = true
+            endif
             assign collab_tag = ''
             for tag in p.tags
               if tag contains 'collab:'
@@ -340,7 +402,14 @@
               assign second_media = p.media[1]
             endif
           -%}
-          <a href="{{ p.url }}" class="collection-list-item{% if is_sold_out %} sold-out{% endif %}">
+          <a
+            href="{{ p.url }}"
+            class="collection-list-item{% if is_sold_out %} sold-out{% endif %}"
+            data-nw-analytics="product_card_click"
+            data-nw-product-id="{{ p.id }}"
+            data-nw-product-title="{{ p.title | escape }}"
+            data-nw-context="collection-grid"
+          >
             <div class="reveal">
               {%- if p.featured_media -%}
                 <img
@@ -368,6 +437,28 @@
                 {%- endif -%}
               {%- endif -%}
               <div class="overlay"></div>
+              {%- if is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or p.compare_at_price_max > p.price -%}
+                <div class="product-card-minimal__badge-stack product-card-minimal__badge-stack--collection" aria-label="Ürün etiketleri">
+                  {%- if is_sold_out -%}
+                    <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
+                  {%- elsif is_coming_soon -%}
+                    <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>
+                  {%- else -%}
+                    {%- if is_new_drop -%}
+                      <span class="product-card-minimal__badge product-card-minimal__badge--new">NEW DROP</span>
+                    {%- endif -%}
+                    {%- if is_restock -%}
+                      <span class="product-card-minimal__badge product-card-minimal__badge--restock">RESTOCK</span>
+                    {%- endif -%}
+                    {%- if is_last_pieces -%}
+                      <span class="product-card-minimal__badge product-card-minimal__badge--last">LAST PIECES</span>
+                    {%- endif -%}
+                    {%- if p.compare_at_price_max > p.price -%}
+                      <span class="product-card-minimal__badge product-card-minimal__badge--sale">SALE</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
             </div>
 
             {%- if collab_tag != '' -%}
@@ -448,6 +539,26 @@
     </script>
   {%- endpaginate -%}
 </div>
+
+{%- liquid
+  assign collection_seo_heading = section.settings.seo_heading | strip
+  assign collection_seo_body = section.settings.seo_body | strip
+-%}
+
+{%- if collection_seo_heading != blank or collection_seo_body != blank -%}
+  <section class="nbhd-collection-seo page-width" aria-labelledby="NbhdCollectionSeo-{{ section.id }}">
+    {%- if collection_seo_heading != blank -%}
+      <h2 id="NbhdCollectionSeo-{{ section.id }}" class="nbhd-collection-seo__heading">
+        {{ collection_seo_heading | escape }}
+      </h2>
+    {%- endif -%}
+    {%- if collection_seo_body != blank -%}
+      <div class="nbhd-collection-seo__body rte">
+        {{ section.settings.seo_body }}
+      </div>
+    {%- endif -%}
+  </section>
+{%- endif -%}
 
 <script>
 (function(){
@@ -531,6 +642,18 @@
       "step": 6,
       "label": "Products per page",
       "default": 30
+    },
+    {
+      "type": "text",
+      "id": "seo_heading",
+      "label": "Collection SEO heading",
+      "default": "Drop notes"
+    },
+    {
+      "type": "richtext",
+      "id": "seo_body",
+      "label": "Collection SEO body",
+      "default": "<p>None Wear pieces are built around daily rotation, limited drops and street-ready silhouettes. Explore the latest selection with fast delivery and free shipping notes on eligible products.</p>"
     },
     {
       "type": "range",

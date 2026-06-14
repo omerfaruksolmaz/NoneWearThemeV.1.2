@@ -41,6 +41,33 @@
   .search__button .icon {
     height: 1.8rem;
   }
+
+  .template-search__empty-guide {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    max-width: 54rem;
+    margin: 1.4rem auto 0;
+  }
+
+  .template-search__empty-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3.2rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(var(--color-foreground), 0.2);
+    color: rgb(var(--color-foreground));
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .template-search__empty-link:hover {
+    border-color: rgb(var(--color-foreground));
+  }
 </style>
 
 {%- liquid
@@ -142,6 +169,24 @@
         {%- endunless -%}
         {%- if search.results_count == 0 and search.filters == empty -%}
           <p role="status">{{ 'templates.search.no_results' | t: terms: search.terms }}</p>
+          <div class="template-search__empty-guide" aria-label="Search suggestions">
+            <a
+              class="template-search__empty-link"
+              href="{{ routes.all_products_collection_url }}"
+              data-nw-analytics="search_empty_link"
+              data-nw-context="all-products"
+            >
+              Tüm ürünler
+            </a>
+            <a
+              class="template-search__empty-link"
+              href="{{ routes.root_url }}#drop"
+              data-nw-analytics="search_empty_link"
+              data-nw-context="home-drop"
+            >
+              New drop
+            </a>
+          </div>
         {%- endif -%}
       {%- endif -%}
     </div>

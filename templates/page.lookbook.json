@@ -1,0 +1,56 @@
+{
+  "sections": {
+    "main": {
+      "type": "nonewear-lookbook",
+      "blocks": {
+        "note_daily": {
+          "type": "note",
+          "settings": {
+            "kicker": "01",
+            "heading": "Daily uniform",
+            "body": "<p>Heavy basics, sharp proportions and repeatable combinations for the week.</p>"
+          }
+        },
+        "note_drop": {
+          "type": "note",
+          "settings": {
+            "kicker": "02",
+            "heading": "Drop rhythm",
+            "body": "<p>Follow new-drop, restock and last-pieces tags before sizes disappear.</p>"
+          }
+        },
+        "note_delivery": {
+          "type": "note",
+          "settings": {
+            "kicker": "03",
+            "heading": "Fast rotation",
+            "body": "<p>Eligible pieces show free shipping and fast delivery directly on the card.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "note_daily",
+        "note_drop",
+        "note_delivery"
+      ],
+      "settings": {
+        "kicker": "LOOKBOOK",
+        "heading": "Outside the system",
+        "meta": "None Wear drop notes",
+        "body": "<p>A tight edit of street-ready pieces, built for daily rotation. Mix silhouettes, follow the drop rhythm and keep the fit intentional.</p>",
+        "products_heading": "Shop the edit",
+        "collection": "all",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "show_vendor": true,
+        "show_product_type": false,
+        "show_secondary_image": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

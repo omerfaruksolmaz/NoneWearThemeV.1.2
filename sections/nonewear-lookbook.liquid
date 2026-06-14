@@ -1,0 +1,403 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  .nonewear-lookbook-{{ section.id }} {
+    border-top: 1px solid var(--editorial-border);
+    border-bottom: 1px solid var(--editorial-border);
+    font-family: var(--nonewear-sans);
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__masthead {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+    gap: 1.4rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--editorial-border);
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__kicker,
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__meta,
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note-kicker,
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__link {
+    color: var(--editorial-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__heading {
+    max-width: 18ch;
+    margin: 0.45rem 0 0;
+    color: var(--editorial-ink);
+    font-size: 4.8rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__body {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--editorial-muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__notes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: 1px solid var(--editorial-border);
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note {
+    min-height: 10rem;
+    padding: 1rem;
+    border-right: 1px solid var(--editorial-border);
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note-title {
+    margin: 0.45rem 0;
+    color: var(--editorial-ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note-body {
+    color: var(--editorial-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note-body > * {
+    margin-top: 0;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__products-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--editorial-border);
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__link {
+    color: var(--editorial-ink);
+    text-decoration: none;
+  }
+
+  .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__link:hover {
+    color: var(--editorial-muted);
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__masthead,
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__notes {
+      grid-template-columns: 1fr;
+    }
+
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note,
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note:nth-child(3n) {
+      border-right: 0;
+      border-bottom: 1px solid var(--editorial-border);
+    }
+
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__note:last-child {
+      border-bottom: 0;
+    }
+
+    .nonewear-lookbook-{{ section.id }} .nonewear-lookbook__heading {
+      font-size: 2.4rem;
+      line-height: 0.98;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign featured_collection = section.settings.collection
+  if featured_collection != blank
+    assign sorted_products = featured_collection.products | sort: 'created_at' | reverse
+  endif
+-%}
+
+<section class="nonewear-lookbook nonewear-lookbook-{{ section.id }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="nonewear-lookbook__masthead">
+      <div>
+        {%- if section.settings.kicker != blank -%}
+          <div class="nonewear-lookbook__kicker">{{ section.settings.kicker | escape }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          {%- if template.name == 'page' -%}
+            <h1 class="nonewear-lookbook__heading">{{ section.settings.heading | escape }}</h1>
+          {%- else -%}
+            <h2 class="nonewear-lookbook__heading">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+      <div>
+        {%- if section.settings.meta != blank -%}
+          <div class="nonewear-lookbook__meta">{{ section.settings.meta | escape }}</div>
+        {%- endif -%}
+        {%- if section.settings.body != blank -%}
+          <div class="nonewear-lookbook__body rte">
+            {{ section.settings.body }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="nonewear-lookbook__notes">
+        {%- for block in section.blocks -%}
+          <article class="nonewear-lookbook__note" {{ block.shopify_attributes }}>
+            {%- if block.settings.kicker != blank -%}
+              <div class="nonewear-lookbook__note-kicker">{{ block.settings.kicker | escape }}</div>
+            {%- endif -%}
+            {%- if block.settings.heading != blank -%}
+              <h3 class="nonewear-lookbook__note-title">{{ block.settings.heading | escape }}</h3>
+            {%- endif -%}
+            {%- if block.settings.body != blank -%}
+              <div class="nonewear-lookbook__note-body rte">
+                {{ block.settings.body }}
+              </div>
+            {%- endif -%}
+            {%- if block.settings.link_url != blank and block.settings.link_label != blank -%}
+              <a class="nonewear-lookbook__link" href="{{ block.settings.link_url }}">{{ block.settings.link_label | escape }}</a>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="nonewear-lookbook__products-head">
+      <div class="nonewear-lookbook__kicker">{{ section.settings.products_heading | escape }}</div>
+      {%- if featured_collection != blank -%}
+        <a class="nonewear-lookbook__link" href="{{ featured_collection.url }}">VIEW ALL</a>
+      {%- endif -%}
+    </div>
+
+    <div class="editorial-grid editorial-grid--products" style="--editorial-columns-desktop: {{ section.settings.columns_desktop }};">
+      {%- if featured_collection != blank -%}
+        {%- for product in sorted_products limit: section.settings.products_to_show -%}
+          {% render 'product-card-minimal',
+            card_product: product,
+            show_vendor: section.settings.show_vendor,
+            show_product_type: section.settings.show_product_type,
+            show_secondary_image: section.settings.show_secondary_image,
+            lazy_load: forloop.index > 2,
+            media_ratio: '4 / 5'
+          %}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..section.settings.products_to_show) -%}
+          <div class="product-card-minimal">
+            <div class="product-card-minimal__media"></div>
+            <div class="product-card-minimal__body">
+              <div class="product-card-minimal__meta product-card-minimal__meta--brand">none wear</div>
+              <div class="product-card-minimal__title">Look {{ i }}</div>
+              <div class="product-card-minimal__price-row">
+                <span>{{ 0 | money }}</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "None Wear lookbook",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker",
+      "default": "Lookbook"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Outside the system"
+    },
+    {
+      "type": "text",
+      "id": "meta",
+      "label": "Meta line",
+      "default": "None Wear drop notes"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>A tight edit of street-ready pieces, built for daily rotation. Mix silhouettes, follow the drop rhythm and keep the fit intentional.</p>"
+    },
+    {
+      "type": "text",
+      "id": "products_heading",
+      "label": "Products heading",
+      "default": "Shop the edit"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 4,
+      "max": 6,
+      "step": 1,
+      "label": "Desktop columns",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_type",
+      "label": "Show product type when vendor is hidden",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "note",
+      "name": "Editorial note",
+      "settings": [
+        {
+          "type": "text",
+          "id": "kicker",
+          "label": "Kicker",
+          "default": "Note"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Fit first"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Keep the silhouette clean, then let one piece carry the attitude.</p>"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "None Wear lookbook",
+      "blocks": [
+        {
+          "type": "note",
+          "settings": {
+            "kicker": "01",
+            "heading": "Daily uniform",
+            "body": "<p>Heavy basics, sharp proportions and repeatable combinations for the week.</p>"
+          }
+        },
+        {
+          "type": "note",
+          "settings": {
+            "kicker": "02",
+            "heading": "Drop rhythm",
+            "body": "<p>Limited pieces move fast. Watch new-drop and restock tags on product cards.</p>"
+          }
+        },
+        {
+          "type": "note",
+          "settings": {
+            "kicker": "03",
+            "heading": "Fast rotation",
+            "body": "<p>Eligible pieces show free shipping and fast delivery directly on the card.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

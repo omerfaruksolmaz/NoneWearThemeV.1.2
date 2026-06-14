@@ -1,0 +1,27 @@
+name: Theme Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  theme-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: false
+
+      - name: Install Theme Check
+        run: gem install theme-check
+
+      - name: Run Theme Check
+        run: theme-check . --fail-level error

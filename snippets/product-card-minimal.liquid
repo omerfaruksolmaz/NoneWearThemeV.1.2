@@ -41,6 +41,21 @@
       assign is_coming_soon = true
     endif
 
+    assign is_new_drop = false
+    if card_product.tags contains 'new-drop' or card_product.tags contains 'new drop' or card_product.tags contains 'NEW DROP'
+      assign is_new_drop = true
+    endif
+
+    assign is_restock = false
+    if card_product.tags contains 'restock' or card_product.tags contains 'RESTOCK'
+      assign is_restock = true
+    endif
+
+    assign is_last_pieces = false
+    if card_product.tags contains 'last-pieces' or card_product.tags contains 'last pieces' or card_product.tags contains 'LAST PIECES'
+      assign is_last_pieces = true
+    endif
+
     assign show_delivery_benefits = false
     if card_product.available and is_coming_soon == false
       assign show_delivery_benefits = true
@@ -60,7 +75,14 @@
     class="product-card-minimal{% if is_sold_out %} product-card-minimal--sold-out{% endif %}"
     data-media-count="{{ media_count }}"
   >
-    <a class="product-card-minimal__link" href="{{ card_product.url }}">
+    <a
+      class="product-card-minimal__link"
+      href="{{ card_product.url }}"
+      data-nw-analytics="product_card_click"
+      data-nw-product-id="{{ card_product.id }}"
+      data-nw-product-title="{{ card_product.title | escape }}"
+      data-nw-context="editorial-card"
+    >
       <div class="product-card-minimal__media" style="--card-media-ratio: {{ media_ratio | default: '4 / 5' }};">
 
         {%- if featured_media -%}
@@ -108,13 +130,28 @@
           <span class="product-card-minimal__placeholder">{{ card_product.title | escape }}</span>
         {%- endif -%}
 
-        {%- comment %} Rozet {%- endcomment %}
-        {%- if is_sold_out -%}
-          <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
-        {%- elsif is_coming_soon -%}
-          <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>
-        {%- elsif card_product.compare_at_price_max > card_product.price -%}
-          <span class="product-card-minimal__badge product-card-minimal__badge--sale">SALE</span>
+        {%- comment %} Tag bazlı rozetler {%- endcomment %}
+        {%- if is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or card_product.compare_at_price_max > card_product.price -%}
+          <div class="product-card-minimal__badge-stack" aria-label="Ürün etiketleri">
+            {%- if is_sold_out -%}
+              <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
+            {%- elsif is_coming_soon -%}
+              <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>
+            {%- else -%}
+              {%- if is_new_drop -%}
+                <span class="product-card-minimal__badge product-card-minimal__badge--new">NEW DROP</span>
+              {%- endif -%}
+              {%- if is_restock -%}
+                <span class="product-card-minimal__badge product-card-minimal__badge--restock">RESTOCK</span>
+              {%- endif -%}
+              {%- if is_last_pieces -%}
+                <span class="product-card-minimal__badge product-card-minimal__badge--last">LAST PIECES</span>
+              {%- endif -%}
+              {%- if card_product.compare_at_price_max > card_product.price -%}
+                <span class="product-card-minimal__badge product-card-minimal__badge--sale">SALE</span>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
         {%- endif -%}
 
       </div>

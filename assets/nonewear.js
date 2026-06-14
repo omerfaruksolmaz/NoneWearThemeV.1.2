@@ -282,10 +282,52 @@
   /* ----------------------------------------------------------
      BAŞLAT
   ---------------------------------------------------------- */
+  function pushNwEvent(name, detail) {
+    if (!name) return;
+
+    var payload = Object.assign({ event: 'nonewear_' + name }, detail || {});
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+
+    if (typeof window.fbq === 'function') {
+      window.fbq('trackCustom', 'nonewear_' + name, detail || {});
+    }
+  }
+
+  function initAnalytics(root) {
+    root = root || document;
+
+    root.querySelectorAll('[data-nw-analytics]').forEach(function (el) {
+      if (el.__nwAnalyticsBound) return;
+      el.__nwAnalyticsBound = true;
+
+      el.addEventListener('click', function () {
+        pushNwEvent(el.dataset.nwAnalytics, {
+          product_id: el.dataset.nwProductId || '',
+          product_title: el.dataset.nwProductTitle || '',
+          context: el.dataset.nwContext || '',
+          href: el.href || ''
+        });
+      });
+    });
+
+    var emptyGuide = root.querySelector('.template-search__empty-guide');
+    if (emptyGuide && !emptyGuide.__nwEmptyTracked) {
+      emptyGuide.__nwEmptyTracked = true;
+      var input = document.getElementById('Search-In-Template');
+      pushNwEvent('search_no_results', {
+        search_term: input ? input.value : '',
+        context: 'search'
+      });
+    }
+  }
+
   function init(root) {
     initCardHover(root);
     initMagnifier(root);
     initLightbox(root);
+    initAnalytics(root);
   }
 
   if (document.readyState === 'loading') {

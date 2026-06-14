@@ -12,11 +12,18 @@
   if material_metafield != blank
     assign material_value = material_metafield.value | default: material_metafield
   endif
+
+  assign fit_metafield = product.metafields.custom.fit
+  assign size_note_metafield = product.metafields.custom.size_note
+  assign model_info_metafield = product.metafields.custom.model_info
+
+  assign fit_value = fit_metafield.value | default: fit_metafield | default: section.settings.fit_note_default
+  assign size_note_value = size_note_metafield.value | default: size_note_metafield | default: section.settings.size_note_default
+  assign model_info_value = model_info_metafield.value | default: model_info_metafield | default: section.settings.model_info_default
 -%}
 
 <style>
-  .nw-sticky-atc,
-  .editorial-product__trust-line {
+  .nw-sticky-atc {
     display: none;
   }
 
@@ -38,18 +45,6 @@
       color: var(--editorial-ink);
       text-decoration: underline;
       text-underline-offset: 0.25rem;
-    }
-
-    .editorial-product__trust {
-      gap: 0.6rem;
-    }
-
-    .editorial-product__trust-line {
-      display: block;
-      color: var(--editorial-ink);
-      font-size: 1rem;
-      line-height: 1.35;
-      letter-spacing: 0.06em;
     }
 
     .editorial-product .product-form__input--pill input[type='radio'] + label {
@@ -195,6 +190,28 @@
           >
             {{ section.settings.size_guide_label | default: 'Beden rehberi' | escape }}
           </a>
+          {%- if fit_value != blank or size_note_value != blank or model_info_value != blank -%}
+            <div class="editorial-product__fit-card" aria-label="Beden ve kalıp notları">
+              {%- if fit_value != blank -%}
+                <div class="editorial-product__fit-line">
+                  <span>Kalıp</span>
+                  <strong>{{ fit_value | escape }}</strong>
+                </div>
+              {%- endif -%}
+              {%- if size_note_value != blank -%}
+                <div class="editorial-product__fit-line">
+                  <span>Beden notu</span>
+                  <strong>{{ size_note_value | escape }}</strong>
+                </div>
+              {%- endif -%}
+              {%- if model_info_value != blank -%}
+                <div class="editorial-product__fit-line">
+                  <span>Model</span>
+                  <strong>{{ model_info_value | escape }}</strong>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
         {%- when 'buy_buttons' -%}
           {%- render 'buy-buttons',
             block: block,
@@ -204,7 +221,12 @@
             show_pickup_availability: false
           -%}
           <div class="editorial-product__trust">
-            <p class="editorial-product__trust-line">Güvenli ödeme · Ücretsiz kargo · Hızlı teslimat · Kolay iade</p>
+            <div class="editorial-product__trust-grid" aria-label="Satın alma avantajları">
+              <span>Güvenli ödeme</span>
+              <span>Ücretsiz kargo</span>
+              <span>1-3 iş günü teslimat</span>
+              <span>14 gün iade/değişim</span>
+            </div>
           </div>
         {%- when 'description' -%}
           {%- if product.description != blank -%}
