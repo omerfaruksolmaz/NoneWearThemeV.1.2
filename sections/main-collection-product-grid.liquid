@@ -325,6 +325,10 @@
             if p.available == false
               assign is_sold_out = true
             endif
+            assign is_coming_soon = false
+            if p.tags contains 'coming-soon' or p.tags contains 'coming soon' or p.tags contains 'COMING SOON'
+              assign is_coming_soon = true
+            endif
             assign collab_tag = ''
             for tag in p.tags
               if tag contains 'collab:'
@@ -341,17 +345,23 @@
               {%- if p.featured_media -%}
                 <img
                   src="{{ p.featured_media | image_url: width: 600 }}"
+                  srcset="{{ p.featured_media | image_url: width: 360 }} 360w, {{ p.featured_media | image_url: width: 540 }} 540w, {{ p.featured_media | image_url: width: 720 }} 720w, {{ p.featured_media | image_url: width: 900 }} 900w"
+                  sizes="(min-width: 1200px) 16vw, (min-width: 750px) 25vw, 50vw"
                   alt="{{ p.featured_media.alt | default: p.title | escape }}"
                   loading="{% if forloop.index > 6 %}lazy{% else %}eager{% endif %}"
+                  decoding="async"
                   width="{{ p.featured_media.width }}"
                   height="{{ p.featured_media.height }}"
                 >
                 {%- if second_media != nil -%}
                   <img
                     src="{{ second_media | image_url: width: 600 }}"
+                    srcset="{{ second_media | image_url: width: 360 }} 360w, {{ second_media | image_url: width: 540 }} 540w, {{ second_media | image_url: width: 720 }} 720w, {{ second_media | image_url: width: 900 }} 900w"
+                    sizes="(min-width: 1200px) 16vw, (min-width: 750px) 25vw, 50vw"
                     class="reveal__hover"
                     alt="{{ second_media.alt | default: p.title | escape }}"
                     loading="lazy"
+                    decoding="async"
                     width="{{ second_media.width }}"
                     height="{{ second_media.height }}"
                   >
@@ -372,6 +382,12 @@
               </span>
               {%- if is_sold_out -%}<span class="product-label">TÜKENDİ</span>{%- endif -%}
             </p>
+            {%- if p.available and is_coming_soon == false -%}
+              <div class="product-card-minimal__benefits product-card-minimal__benefits--collection" aria-label="Teslimat avantajları">
+                <span>Ücretsiz Kargo</span>
+                <span>Hızlı Teslimat</span>
+              </div>
+            {%- endif -%}
           </a>
         {%- endfor -%}
       </div>
@@ -405,6 +421,31 @@
       {%- endif -%}
 
     {%- endif -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": {{ shop.url | append: collection.url | append: '#collection' | json }},
+      "name": {{ collection.title | json }},
+      {%- if collection.description != blank -%}
+        "description": {{ collection.description | strip_html | strip | json }},
+      {%- endif -%}
+      "url": {{ shop.url | append: collection.url | json }},
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {%- for item_product in collection.products -%}
+            {
+              "@type": "ListItem",
+              "position": {{ paginate.current_offset | plus: forloop.index }},
+              "url": {{ shop.url | append: item_product.url | json }},
+              "name": {{ item_product.title | json }}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      }
+    }
+    </script>
   {%- endpaginate -%}
 </div>
 

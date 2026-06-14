@@ -17,6 +17,12 @@
   if page_image
     assign og_image_url = page_image | image_url: width: 1200, height: 630, crop: 'center'
     assign og_image_alt = page_image.alt | default: og_title
+  elsif settings.brand_image != blank
+    assign og_image_url = settings.brand_image | image_url: width: 1200, height: 630, crop: 'center'
+    assign og_image_alt = settings.brand_headline | strip_html | default: og_title
+  elsif settings.logo != blank
+    assign og_image_url = settings.logo | image_url: width: 1200, height: 630, crop: 'center'
+    assign og_image_alt = shop.name
   endif
 %}
 

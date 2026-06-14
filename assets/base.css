@@ -3595,23 +3595,3 @@ details-disclosure > details {
     transform: translateX(100%) scaleX(0);
   }
 }
-
-/* ── Ücretsiz Kargo Badge ── */
-.free-shipping-badge {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 3px 7px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: #f0f0f0;
-  color: #333;
-}
-
-/* Koyu tema uyumu */
-.color-background-2 .free-shipping-badge,
-.color-inverse .free-shipping-badge {
-  background: rgba(255, 255, 255, 0.12);
-  color: #e8e8e8;
-}

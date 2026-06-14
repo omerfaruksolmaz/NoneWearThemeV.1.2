@@ -41,6 +41,11 @@
       assign is_coming_soon = true
     endif
 
+    assign show_delivery_benefits = false
+    if card_product.available and is_coming_soon == false
+      assign show_delivery_benefits = true
+    endif
+
     assign image_loading = 'lazy'
     if lazy_load == false
       assign image_loading = 'eager'
@@ -130,6 +135,12 @@
             {%- endif -%}
           {%- endif -%}
         </div>
+        {%- if show_delivery_benefits -%}
+          <div class="product-card-minimal__benefits" aria-label="Teslimat avantajları">
+            <span>Ücretsiz Kargo</span>
+            <span>Hızlı Teslimat</span>
+          </div>
+        {%- endif -%}
       </div>
 
     </a>

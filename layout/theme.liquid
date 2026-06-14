@@ -40,8 +40,14 @@
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
 
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
+    {%- liquid
+      assign meta_description = page_description | default: shop.description
+      if request.page_type == 'index' and meta_description == blank and settings.brand_description != blank
+        assign meta_description = settings.brand_description | strip_html | strip
+      endif
+    -%}
+    {% if meta_description != blank %}
+      <meta name="description" content="{{ meta_description | truncate: 320 | escape }}">
     {% endif %}
 
     {%- comment -%} Noindex: tag sayfaları ve arama sonuçları için {%- endcomment -%}
@@ -55,46 +61,66 @@
 
     {%- comment -%} Organization + WebSite JSON-LD (yalnızca anasayfa) {%- endcomment -%}
     {%- if request.page_type == 'index' -%}
+      {%- liquid
+        assign organization_description = settings.brand_description | strip_html | strip
+        assign organization_logo = settings.logo
+        if organization_logo == blank and settings.brand_image != blank
+          assign organization_logo = settings.brand_image
+        endif
+        assign same_as_count = 0
+      -%}
       <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@graph": [
           {
             "@type": "Organization",
-            "@id": "{{ request.origin }}/#organization",
+            "@id": {{ request.origin | append: '/#organization' | json }},
             "name": {{ shop.name | json }},
             "url": {{ request.origin | json }},
-            "logo": {
-              "@type": "ImageObject",
-              "url": {{ settings.logo | image_url: width: 300 | prepend: 'https:' | json }}
-            },
+            {%- if organization_description != blank -%}
+              "description": {{ organization_description | json }},
+            {%- endif -%}
+            {%- if organization_logo != blank -%}
+              "logo": {
+                "@type": "ImageObject",
+                "url": {{ organization_logo | image_url: width: 300 | prepend: 'https:' | json }}
+              },
+            {%- endif -%}
             "sameAs": [
-              {%- assign social_links = '' -%}
-              {%- if settings.social_instagram_link != blank -%}{%- assign social_links = social_links | append: settings.social_instagram_link | append: ',' -%}{%- endif -%}
-              {%- if settings.social_facebook_link != blank -%}{%- assign social_links = social_links | append: settings.social_facebook_link | append: ',' -%}{%- endif -%}
-              {%- if settings.social_twitter_link != blank -%}{%- assign social_links = social_links | append: settings.social_twitter_link | append: ',' -%}{%- endif -%}
-              {%- if settings.social_tiktok_link != blank -%}{%- assign social_links = social_links | append: settings.social_tiktok_link | append: ',' -%}{%- endif -%}
-              {%- assign social_array = social_links | split: ',' -%}
-              {%- for link in social_array -%}
-                {%- if link != blank -%}
-                  {{ link | json }}{%- unless forloop.last -%},{%- endunless -%}
-                {%- endif -%}
-              {%- endfor -%}
+              {%- if settings.social_instagram_link != blank -%}
+                {{ settings.social_instagram_link | json }}
+                {%- assign same_as_count = same_as_count | plus: 1 -%}
+              {%- endif -%}
+              {%- if settings.social_facebook_link != blank -%}
+                {%- if same_as_count > 0 -%},{%- endif -%}
+                {{ settings.social_facebook_link | json }}
+                {%- assign same_as_count = same_as_count | plus: 1 -%}
+              {%- endif -%}
+              {%- if settings.social_twitter_link != blank -%}
+                {%- if same_as_count > 0 -%},{%- endif -%}
+                {{ settings.social_twitter_link | json }}
+                {%- assign same_as_count = same_as_count | plus: 1 -%}
+              {%- endif -%}
+              {%- if settings.social_tiktok_link != blank -%}
+                {%- if same_as_count > 0 -%},{%- endif -%}
+                {{ settings.social_tiktok_link | json }}
+              {%- endif -%}
             ]
           },
           {
             "@type": "WebSite",
-            "@id": "{{ request.origin }}/#website",
+            "@id": {{ request.origin | append: '/#website' | json }},
             "url": {{ request.origin | json }},
             "name": {{ shop.name | json }},
             "publisher": {
-              "@id": "{{ request.origin }}/#organization"
+              "@id": {{ request.origin | append: '/#organization' | json }}
             },
             "potentialAction": {
               "@type": "SearchAction",
               "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": "{{ routes.search_url }}?q={search_term_string}"
+                "urlTemplate": {{ request.origin | append: routes.search_url | append: '?q={search_term_string}' | json }}
               },
               "query-input": "required name=search_term_string"
             }

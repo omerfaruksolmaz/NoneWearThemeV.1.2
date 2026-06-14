@@ -458,15 +458,6 @@ document.querySelectorAll('.nbhd-header__nav-item--has-drop').forEach(function(i
 })();
 {% endjavascript %}
 
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "Organization",
-    "name": {{ shop.name | json }},
-    "url": {{ request.origin | append: page.url | json }}
-  }
-</script>
-
 {% schema %}
 {
   "name": "Header",

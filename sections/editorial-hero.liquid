@@ -25,6 +25,14 @@
 
 <section class="editorial-hero section-{{ section.id }}-padding">
   <div class="page-width">
+    {%- liquid
+      assign hero_title = settings.brand_headline | strip_html | strip
+      if hero_title == blank
+        assign hero_title = shop.name
+      endif
+    -%}
+    <h1 class="editorial-hero__title">{{ hero_title | escape }}</h1>
+
     <div class="editorial-hero__layout">
       <div class="editorial-hero__media section-{{ section.id }}-hero-height">
         {%- if section.settings.image != blank -%}

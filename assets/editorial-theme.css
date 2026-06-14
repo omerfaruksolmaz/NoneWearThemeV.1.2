@@ -680,6 +680,19 @@ html[data-nonewear-theme='dark'] .editorial-hero__fallback-wordmark--dark {
   border-bottom: 1px solid var(--editorial-border);
 }
 
+.editorial-hero__title {
+  margin: 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--editorial-border);
+  border-bottom: 1px solid var(--editorial-border);
+  color: var(--editorial-muted);
+  font-family: var(--nonewear-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
 .editorial-hero__layout {
   display: grid;
   gap: 1px;
@@ -1042,6 +1055,29 @@ html[data-nonewear-theme='dark'] .product-card-minimal__badge--coming-soon {
   color: var(--editorial-muted);
   font-size: 0.82rem;
   text-decoration: line-through;
+}
+
+.product-card-minimal__benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.45rem;
+}
+
+.product-card-minimal__benefits span {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 1.35rem;
+  padding: 0.18rem 0.42rem;
+  border: 1px solid var(--editorial-border);
+  color: var(--editorial-ink);
+  background: transparent;
+  font-family: var(--nonewear-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .product-card-minimal__status {
@@ -3091,50 +3127,6 @@ html[data-nonewear-theme='dark'] .product-card-minimal__badge--coming-soon {
 }
 
 /* ============================================================
-   ÜRÜN KARTI — CSS Grid overlap (hover resim geçişi)
-   ============================================================ */
-
-.product-card-minimal__media {
-  position: relative;
-  display: grid;
-  /* stretch (default) — image-stack tam alanı doldurur */
-  padding: 0;
-  background: var(--editorial-frame);
-  aspect-ratio: var(--card-media-ratio, 4 / 5);
-  overflow: hidden;
-}
-
-.product-card-minimal__image-stack {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Tüm görseller aynı grid hücresine → üst üste */
-.product-card-minimal__image--primary,
-.product-card-minimal__image--alt {
-  grid-column: 1;
-  grid-row: 1;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.18s ease;
-}
-
-.product-card-minimal__image--alt   { opacity: 0; }
-.product-card-minimal__image--alt.is-visible   { opacity: 1; }
-.product-card-minimal__image--primary.is-faded { opacity: 0; }
-
-/* Eski secondary class → kapatılıyor */
-.product-card-minimal__image--secondary { opacity: 0 !important; }
-.product-card-minimal:hover .product-card-minimal__image--secondary { opacity: 0 !important; }
-.product-card-minimal:hover .product-card-minimal__image--primary.has-secondary { opacity: 1 !important; }
-
-/* ============================================================
    ÜRÜN LİSTESİ GRİD — 1px çizgiler, dış bordür
    ============================================================ */
 
@@ -4689,8 +4681,8 @@ html, body {
 .nbhd-filter {
   display: block;
   font-family: var(--nonewear-sans);
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
+  border-bottom: 1px solid var(--editorial-border);
 }
 
 .nbhd-filter__form {
@@ -4701,7 +4693,7 @@ html, body {
 .nbhd-filter__col {
   flex: 1;
   min-height: 220px;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--editorial-border);
   padding: 22px 20px 16px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -4727,13 +4719,13 @@ html, body {
   padding: 0;
   margin: 0 0 6px;
   font-family: var(--nonewear-sans);
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 13px;
   text-decoration: none;
 }
 
 .nbhd-filter__col-title a:hover {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 .nbhd-filter__list {
@@ -4749,7 +4741,7 @@ html, body {
 .nbhd-filter__item {
   display: block;
   font-family: var(--nonewear-sans);
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 13px;
   cursor: pointer;
   user-select: none;
@@ -4758,15 +4750,15 @@ html, body {
 }
 
 .nbhd-filter__item:hover {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 .nbhd-filter__item--active {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 .nbhd-filter__item--gray {
-  color: #ccc;
+  color: var(--editorial-muted);
 }
 
 /* HIDE SOLD OUT */
@@ -4776,7 +4768,7 @@ html, body {
   gap: 8px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
   flex-shrink: 0;
 }
 
@@ -4785,8 +4777,8 @@ html, body {
   width: 16px;
   height: 16px;
   min-width: 16px;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid var(--editorial-border);
+  background: var(--editorial-bg);
   cursor: pointer;
   position: relative;
   vertical-align: middle;
@@ -4794,8 +4786,8 @@ html, body {
 }
 
 .nbhd-filter__checkbox.is-on {
-  background: #000;
-  border-color: #000;
+  background: var(--editorial-ink);
+  border-color: var(--editorial-ink);
 }
 
 .nbhd-filter__checkbox.is-on::after {
@@ -4815,7 +4807,7 @@ html, body {
 .nbhd-filter__clear {
   margin-top: auto;
   padding-top: 8px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
   text-align: right;
   flex-shrink: 0;
 }
@@ -4823,7 +4815,7 @@ html, body {
 .nbhd-filter__clear a {
   display: inline-block;
   text-decoration: none;
-  color: #222;
+  color: var(--editorial-ink);
   font-family: var(--nonewear-sans);
   font-size: 13px;
   padding: 5px 0;
@@ -4831,7 +4823,7 @@ html, body {
 }
 
 .nbhd-filter__clear a:hover {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 /* ── Mobile filter bar ── */
@@ -4844,11 +4836,11 @@ html, body {
 .nbhd-filter-sp__btn {
   flex: 1;
   height: 50px;
-  background: #fff;
+  background: var(--editorial-bg);
   border: none;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--editorial-border);
   font-family: var(--nonewear-sans);
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 15px;
   cursor: pointer;
   user-select: none;
@@ -4856,7 +4848,7 @@ html, body {
 }
 
 .nbhd-filter-sp__btn:first-child {
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--editorial-border);
 }
 
 /* Mobile slide-up panels */
@@ -4866,7 +4858,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 85vh;
-  background: #fff;
+  background: var(--editorial-bg);
   z-index: 10011;
   transition: bottom 0.35s ease;
   display: flex;
@@ -4883,21 +4875,21 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--editorial-border);
   flex-shrink: 0;
 }
 
 .nbhd-sp-panel__title {
   font-family: var(--nonewear-sans);
   font-size: 16px;
-  color: #222;
+  color: var(--editorial-ink);
 }
 
 .nbhd-sp-panel__close {
   background: none;
   border: none;
   font-size: 16px;
-  color: #222;
+  color: var(--editorial-ink);
   cursor: pointer;
   padding: 0;
   line-height: 1;
@@ -4913,9 +4905,9 @@ html, body {
   font-family: var(--nonewear-sans);
   font-size: 13px;
   font-weight: 700;
-  color: #222;
+  color: var(--editorial-ink);
   padding: 18px 20px 10px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--editorial-border);
 }
 
 .nbhd-sp-list {
@@ -4925,13 +4917,13 @@ html, body {
 }
 
 .nbhd-sp-list li {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--editorial-border);
 }
 
 .nbhd-sp-item {
   display: block;
   font-family: var(--nonewear-sans);
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 13px;
   text-decoration: none;
   padding: 13px 20px;
@@ -4941,7 +4933,7 @@ html, body {
 }
 
 .nbhd-sp-item:hover {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 .nbhd-sp-item--all {
@@ -4949,7 +4941,7 @@ html, body {
 }
 
 .nbhd-sp-divider {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
   margin: 0;
 }
 
@@ -4958,7 +4950,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 13px 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--editorial-border);
 }
 
 .nbhd-sp-clear {
@@ -4969,14 +4961,14 @@ html, body {
 .nbhd-sp-clear a {
   display: inline-block;
   font-family: var(--nonewear-sans);
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 13px;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .nbhd-sp-clear a:hover {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 /* Overlay behind mobile panels */
@@ -5005,7 +4997,7 @@ html, body {
   flex-wrap: wrap;
   width: 100%;
   justify-content: flex-start;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
   margin-bottom: 0;
 }
 
@@ -5016,10 +5008,10 @@ html, body {
   max-width: 16.66667%;
   text-align: center;
   padding: 30px 30px 10px;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  border-right: 1px solid var(--editorial-border);
+  border-bottom: 1px solid var(--editorial-border);
   text-decoration: none;
-  color: #222;
+  color: var(--editorial-ink);
   display: block;
 }
 
@@ -5028,7 +5020,7 @@ html, body {
 }
 
 .collection-list-item p {
-  color: #222;
+  color: var(--editorial-ink);
   text-decoration: none;
   text-align: left;
   margin-top: 0;
@@ -5068,7 +5060,7 @@ html, body {
 }
 
 .collection-list-item.sold-out .reveal .overlay {
-  background: #f5f5f5;
+  background: var(--editorial-frame);
   opacity: 0.4;
   width: 100%;
   height: 100%;
@@ -5087,7 +5079,7 @@ html, body {
 .collection-list-item.sold-out .product-price,
 .collection-list-item.sold-out .product-title,
 .collection-list-item.sold-out .product-type {
-  color: #aaa;
+  color: var(--editorial-muted);
 }
 
 /* ── Product info ── */
@@ -5099,7 +5091,7 @@ html, body {
   padding-left: 20px;
   transform-origin: top right;
   transform: rotate(90deg) translate(100%, 20px);
-  color: #222;
+  color: var(--editorial-ink);
   font-family: var(--nonewear-sans);
   font-size: 11px;
   white-space: nowrap;
@@ -5146,9 +5138,27 @@ html, body {
   font-size: 10px;
 }
 
+.collection-list-item .product-card-minimal__benefits {
+  justify-content: flex-start;
+  margin-top: 6px;
+}
+
+.collection-list-item .product-card-minimal__benefits span {
+  min-height: 18px;
+  padding: 2px 5px;
+  border-color: var(--editorial-border);
+  color: var(--editorial-ink);
+  font-size: 10px;
+}
+
+html[data-nonewear-theme='dark'] .collection-list-item .product-card-minimal__benefits span {
+  border-color: var(--editorial-border);
+  color: var(--editorial-ink);
+}
+
 /* ── Pagination ── */
 .pagination {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--editorial-border);
   padding: 28px;
   text-align: center;
   font-family: var(--nonewear-sans);
@@ -5161,7 +5171,7 @@ html, body {
   text-decoration: none;
   opacity: 1;
   transition: opacity 0.3s ease-out;
-  color: #222;
+  color: var(--editorial-ink);
 }
 
 .pagination a:hover {
@@ -5169,7 +5179,7 @@ html, body {
 }
 
 .pagination span {
-  color: #222;
+  color: var(--editorial-ink);
   font-size: 13px;
 }
 
@@ -5200,7 +5210,7 @@ html, body {
 }
 
 .pagination .active {
-  color: #999 !important;
+  color: var(--editorial-muted) !important;
 }
 
 .pagination .page {
@@ -5218,7 +5228,7 @@ html, body {
     padding: 15px 15px 5px;
   }
 
-  .collection-list-item:nth-of-type(6n) { border-right: 1px solid #ddd; }
+  .collection-list-item:nth-of-type(6n) { border-right: 1px solid var(--editorial-border); }
   .collection-list-item:nth-of-type(2n) { border-right: none; }
 
   .collection-list-item .reveal {
@@ -5241,7 +5251,7 @@ html, body {
     padding: 20px 20px 8px;
   }
 
-  .collection-list-item:nth-of-type(6n) { border-right: 1px solid #ddd; }
+  .collection-list-item:nth-of-type(6n) { border-right: 1px solid var(--editorial-border); }
   .collection-list-item:nth-of-type(4n) { border-right: none; }
 
   .collection-list-item .reveal {
@@ -5256,7 +5266,7 @@ html, body {
     max-width: 25%;
   }
 
-  .collection-list-item:nth-of-type(6n) { border-right: 1px solid #ddd; }
+  .collection-list-item:nth-of-type(6n) { border-right: 1px solid var(--editorial-border); }
   .collection-list-item:nth-of-type(4n) { border-right: none; }
 
   .collection-list-item .reveal {
