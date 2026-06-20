@@ -142,9 +142,10 @@ if (!customElements.get('product-form')) {
             button.removeAttribute('disabled');
           }
 
-          if (text) {
+          const resolvedText = disable ? text : button.dataset.availableLabel || text;
+          if (resolvedText) {
             const label = button.querySelector('span');
-            if (label) label.textContent = text;
+            if (label) label.textContent = resolvedText;
           }
         });
       }

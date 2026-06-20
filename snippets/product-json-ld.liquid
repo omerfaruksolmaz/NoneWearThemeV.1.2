@@ -5,6 +5,14 @@
     assign product_brand = product.vendor | default: shop.name
     assign product_rating = product.metafields.reviews.rating.value
     assign product_rating_count = product.metafields.reviews.rating_count.value | default: product.metafields.reviews.rating_count
+    assign production_status = product.metafields.custom.production_status.value | default: product.metafields.custom.production_status
+    assign is_preproduction = false
+    if production_status == true or production_status == 'true' or production_status == 'active'
+      assign is_preproduction = true
+    endif
+    if product.tags contains 'pre-production' or product.tags contains 'Üretim Aşamasında' or product.tags contains 'URETIM ASAMASINDA'
+      assign is_preproduction = true
+    endif
   -%}
   <script type="application/ld+json">
   {
@@ -43,8 +51,9 @@
           {%- endif -%}
           "priceCurrency": {{ cart.currency.iso_code | json }},
           "price": {{ variant.price | divided_by: 100.0 | json }},
-          "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+          "availability": "https://schema.org/{% if is_preproduction %}PreOrder{% elsif variant.available %}InStock{% else %}OutOfStock{% endif %}",
           "itemCondition": "https://schema.org/NewCondition",
+          {%- unless is_preproduction -%}
           "shippingDetails": {
             "@type": "OfferShippingDetails",
             "shippingRate": {
@@ -72,6 +81,7 @@
               }
             }
           },
+          {%- endunless -%}
           "hasMerchantReturnPolicy": {
             "@type": "MerchantReturnPolicy",
             "applicableCountry": "TR",

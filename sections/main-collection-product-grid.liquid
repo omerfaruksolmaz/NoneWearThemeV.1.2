@@ -16,17 +16,19 @@
   endfor
 -%}
 
-{%- if collection.title != blank or collection.description != blank -%}
-  <header class="collection-toolbar__overview page-width">
-    {%- if collection.title != blank -%}
-      <h1 class="collection-toolbar__title">{{ collection.title | escape }}</h1>
-    {%- endif -%}
-    {%- if collection.description != blank -%}
-      <div class="collection-toolbar__description rte">
-        {{ collection.description }}
-      </div>
-    {%- endif -%}
-  </header>
+{%- if section.settings.show_collection_header -%}
+  {%- if collection.title != blank or collection.description != blank -%}
+    <header class="collection-toolbar__overview page-width">
+      {%- if collection.title != blank -%}
+        <h1 class="collection-toolbar__title">{{ collection.title | escape }}</h1>
+      {%- endif -%}
+      {%- if collection.description != blank -%}
+        <div class="collection-toolbar__description rte">
+          {{ collection.description }}
+        </div>
+      {%- endif -%}
+    </header>
+  {%- endif -%}
 {%- endif -%}
 
 {%- comment %} ══ DESKTOP FİLTRE ══ {%- endcomment %}
@@ -391,6 +393,14 @@
             if p.tags contains 'last-pieces' or p.tags contains 'last pieces' or p.tags contains 'LAST PIECES'
               assign is_last_pieces = true
             endif
+            assign production_status = p.metafields.custom.production_status.value | default: p.metafields.custom.production_status
+            assign is_preproduction = false
+            if production_status == true or production_status == 'true' or production_status == 'active'
+              assign is_preproduction = true
+            endif
+            if p.tags contains 'pre-production' or p.tags contains 'Üretim Aşamasında' or p.tags contains 'URETIM ASAMASINDA'
+              assign is_preproduction = true
+            endif
             assign collab_tag = ''
             for tag in p.tags
               if tag contains 'collab:'
@@ -437,9 +447,11 @@
                 {%- endif -%}
               {%- endif -%}
               <div class="overlay"></div>
-              {%- if is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or p.compare_at_price_max > p.price -%}
+              {%- if is_preproduction or is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or p.compare_at_price_max > p.price -%}
                 <div class="product-card-minimal__badge-stack product-card-minimal__badge-stack--collection" aria-label="Ürün etiketleri">
-                  {%- if is_sold_out -%}
+                  {%- if is_preproduction -%}
+                    <span class="product-card-minimal__badge product-card-minimal__badge--preproduction">PRE-PRODUCTION</span>
+                  {%- elsif is_sold_out -%}
                     <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
                   {%- elsif is_coming_soon -%}
                     <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>
@@ -473,7 +485,7 @@
               </span>
               {%- if is_sold_out -%}<span class="product-label">TÜKENDİ</span>{%- endif -%}
             </p>
-            {%- if p.available and is_coming_soon == false -%}
+            {%- if p.available and is_coming_soon == false and is_preproduction == false -%}
               <div class="product-card-minimal__benefits product-card-minimal__benefits--collection" aria-label="Teslimat avantajları">
                 <span>Ücretsiz Kargo</span>
                 <span>Hızlı Teslimat</span>
@@ -634,6 +646,12 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_collection_header",
+      "label": "Show collection heading",
+      "default": true
+    },
     {
       "type": "range",
       "id": "products_per_page",

@@ -20,6 +20,30 @@
   assign fit_value = fit_metafield.value | default: fit_metafield | default: section.settings.fit_note_default
   assign size_note_value = size_note_metafield.value | default: size_note_metafield | default: section.settings.size_note_default
   assign model_info_value = model_info_metafield.value | default: model_info_metafield | default: section.settings.model_info_default
+
+  assign production_status = product.metafields.custom.production_status.value | default: product.metafields.custom.production_status
+  assign is_preproduction = false
+  if production_status == true or production_status == 'true' or production_status == 'active'
+    assign is_preproduction = true
+  endif
+  if product.tags contains 'pre-production' or product.tags contains 'Üretim Aşamasında' or product.tags contains 'URETIM ASAMASINDA'
+    assign is_preproduction = true
+  endif
+
+  assign production_stage = product.metafields.custom.production_stage.value | default: product.metafields.custom.production_stage | default: 3 | plus: 0
+  if production_stage < 1
+    assign production_stage = 1
+  elsif production_stage > 6
+    assign production_stage = 6
+  endif
+
+  assign production_note = product.metafields.custom.production_note.value | default: product.metafields.custom.production_note | default: section.settings.preproduction_body
+  assign production_delivery = product.metafields.custom.production_delivery.value | default: product.metafields.custom.production_delivery | default: section.settings.preproduction_delivery
+  assign production_cta = section.settings.preproduction_cta | default: 'Üretim Partisine Katıl'
+  assign sticky_available_label = 'products.product.add_to_cart' | t
+  if is_preproduction
+    assign sticky_available_label = production_cta
+  endif
 -%}
 
 <style>
@@ -145,6 +169,9 @@
     {%- if product.tags contains 'coming-soon' or product.tags contains 'coming soon' -%}
       <span class="editorial-product__coming-soon-badge">COMING SOON</span>
     {%- endif -%}
+    {%- if is_preproduction -%}
+      <span class="editorial-product__production-badge">PRE-PRODUCTION</span>
+    {%- endif -%}
   </div>
 
   <div class="editorial-product__stack">
@@ -167,6 +194,46 @@
           <div id="price-{{ section.id }}" class="editorial-product__price" role="status" {{ block.shopify_attributes }}>
             {% render 'price', product: product, use_variant: true, show_badges: false %}
           </div>
+          {%- if is_preproduction -%}
+            <aside class="editorial-product__production-note" aria-labelledby="ProductionNote-{{ section.id }}">
+              <div class="editorial-product__production-note-head">
+                <span class="editorial-product__production-index">PRE-01</span>
+                <h2 id="ProductionNote-{{ section.id }}">{{ section.settings.preproduction_heading | default: 'Üretim Aşamasında' | escape }}</h2>
+              </div>
+              <div class="editorial-product__production-copy">
+                {{ production_note | escape | newline_to_br }}
+              </div>
+              <div class="editorial-product__production-delivery">
+                <span>Tahmini teslimat</span>
+                <strong>{{ production_delivery | escape }}</strong>
+              </div>
+            </aside>
+
+            <div class="editorial-product__production-progress" aria-label="Üretim ilerlemesi">
+              <div class="editorial-product__production-progress-head">
+                <span>Üretim süreci</span>
+                <strong>{{ production_stage }} / 6</strong>
+              </div>
+              <ol class="editorial-product__production-steps">
+                {%- for step_index in (1..6) -%}
+                  {%- case step_index -%}
+                    {%- when 1 -%}{%- assign step_label = section.settings.production_step_1 | default: 'Tasarım Tamamlandı' -%}
+                    {%- when 2 -%}{%- assign step_label = section.settings.production_step_2 | default: 'Numune Hazırlandı' -%}
+                    {%- when 3 -%}{%- assign step_label = section.settings.production_step_3 | default: 'Üretim Planlandı' -%}
+                    {%- when 4 -%}{%- assign step_label = section.settings.production_step_4 | default: 'Üretim Sürecinde' -%}
+                    {%- when 5 -%}{%- assign step_label = section.settings.production_step_5 | default: 'Kalite Kontrol' -%}
+                    {%- when 6 -%}{%- assign step_label = section.settings.production_step_6 | default: 'Kargolama' -%}
+                  {%- endcase -%}
+                  <li class="editorial-product__production-step{% if step_index < production_stage %} is-complete{% elsif step_index == production_stage %} is-current{% endif %}">
+                    <span class="editorial-product__production-marker" aria-hidden="true">
+                      {%- if step_index < production_stage -%}✓{%- elsif step_index == production_stage -%}●{%- else -%}○{%- endif -%}
+                    </span>
+                    <span>{{ step_label | escape }}</span>
+                  </li>
+                {%- endfor -%}
+              </ol>
+            </div>
+          {%- endif -%}
         {%- when 'inventory' -%}
           <p
             id="Inventory-{{ section.id }}"
@@ -224,7 +291,11 @@
             <div class="editorial-product__trust-grid" aria-label="Satın alma avantajları">
               <span>Güvenli ödeme</span>
               <span>Ücretsiz kargo</span>
-              <span>1-3 iş günü teslimat</span>
+              {%- if is_preproduction -%}
+                <span>{{ production_delivery | escape }} tahmini teslimat</span>
+              {%- else -%}
+                <span>1-3 iş günü teslimat</span>
+              {%- endif -%}
               <span>14 gün iade/değişim</span>
             </div>
           </div>
@@ -319,7 +390,7 @@
     endif
   -%}
 
-  <div class="nw-sticky-atc" aria-label="Sepete ekle">
+  <div class="nw-sticky-atc" aria-label="{% if is_preproduction %}Üretim partisine katıl{% else %}Sepete ekle{% endif %}">
     <div id="NwStickyPrice-{{ section.id }}" class="nw-sticky-atc__price">
       {% render 'price', product: product, use_variant: true, show_badges: false %}
     </div>
@@ -330,6 +401,7 @@
       class="nw-sticky-atc__button"
       data-product-submit
       data-sticky-product-submit
+      data-available-label="{{ sticky_available_label | escape }}"
       {% if product.selected_or_first_available_variant.available == false
         or sticky_quantity_rule_soldout
         or product.selected_or_first_available_variant == null
@@ -342,6 +414,8 @@
           {{ 'products.product.unavailable' | t }}
         {%- elsif product.selected_or_first_available_variant.available == false or sticky_quantity_rule_soldout -%}
           {{ 'products.product.sold_out' | t }}
+        {%- elsif is_preproduction -%}
+          {{ production_cta }}
         {%- else -%}
           {{ 'products.product.add_to_cart' | t }}
         {%- endif -%}

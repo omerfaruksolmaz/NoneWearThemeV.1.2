@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "production_header": {
+      "type": "preproduction-collection-header",
+      "settings": {
+        "index_label": "NONE WEAR / PRE-01",
+        "heading": "Üretim Aşamasında",
+        "body": "<p>İlk üretim partisine daha düşük fiyatla katıl. Bu seçkideki parçalar üretim tamamlandıktan sonra gönderilir.</p>",
+        "delivery": "45-60 gün",
+        "system_label": "İlk üretim partisi"
+      }
+    },
+    "product_grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "show_collection_header": false,
+        "products_per_page": 30,
+        "seo_heading": "Üretim partisi hakkında",
+        "seo_body": "<p>Bu koleksiyondaki ürünler mevcut stoktan gönderilmez. Siparişiniz ilk üretim partisine dahil edilir ve ürün sayfasında belirtilen tahmini süre içerisinde gönderilir.</p>",
+        "padding_top": 0,
+        "padding_bottom": 24
+      }
+    }
+  },
+  "order": [
+    "production_header",
+    "product_grid"
+  ]
+}

@@ -18,8 +18,22 @@
         assign gift_card_recipient_feature_active = true
       endif
 
+      assign production_status = product.metafields.custom.production_status.value | default: product.metafields.custom.production_status
+      assign is_preproduction = false
+      if production_status == true or production_status == 'true' or production_status == 'active'
+        assign is_preproduction = true
+      endif
+      if product.tags contains 'pre-production' or product.tags contains 'Üretim Aşamasında' or product.tags contains 'URETIM ASAMASINDA'
+        assign is_preproduction = true
+      endif
+      assign available_button_label = 'products.product.add_to_cart' | t
+      if is_preproduction
+        assign available_button_label = section.settings.preproduction_cta | default: 'Üretim Partisine Katıl'
+      endif
+      assign production_delivery = product.metafields.custom.production_delivery.value | default: product.metafields.custom.production_delivery | default: section.settings.preproduction_delivery
+
       assign show_dynamic_checkout = false
-      if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false
+      if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false and is_preproduction == false
         assign show_dynamic_checkout = true
       endif
     -%}
@@ -56,6 +70,11 @@
           class="product-variant-id"
         >
 
+        {%- if is_preproduction -%}
+          <input type="hidden" name="properties[Satış tipi]" value="Üretim Aşamasında">
+          <input type="hidden" name="properties[Tahmini teslimat]" value="{{ production_delivery | escape }}">
+        {%- endif -%}
+
         {%- if gift_card_recipient_feature_active -%}
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
         {%- endif -%}
@@ -76,6 +95,7 @@
             name="add"
             class="product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
             data-product-submit
+            data-available-label="{{ available_button_label | escape }}"
             {% if product.selected_or_first_available_variant.available == false
               or quantity_rule_soldout
               or product.selected_or_first_available_variant == null
@@ -89,7 +109,7 @@
               {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
                 {{ 'products.product.sold_out' | t }}
               {%- else -%}
-                {{ 'products.product.add_to_cart' | t }}
+                {{ available_button_label }}
               {%- endif -%}
             </span>
             {%- render 'loading-spinner' -%}

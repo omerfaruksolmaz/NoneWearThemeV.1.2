@@ -56,8 +56,17 @@
       assign is_last_pieces = true
     endif
 
+    assign production_status = card_product.metafields.custom.production_status.value | default: card_product.metafields.custom.production_status
+    assign is_preproduction = false
+    if production_status == true or production_status == 'true' or production_status == 'active'
+      assign is_preproduction = true
+    endif
+    if card_product.tags contains 'pre-production' or card_product.tags contains 'Üretim Aşamasında' or card_product.tags contains 'URETIM ASAMASINDA'
+      assign is_preproduction = true
+    endif
+
     assign show_delivery_benefits = false
-    if card_product.available and is_coming_soon == false
+    if card_product.available and is_coming_soon == false and is_preproduction == false
       assign show_delivery_benefits = true
     endif
 
@@ -131,9 +140,11 @@
         {%- endif -%}
 
         {%- comment %} Tag bazlı rozetler {%- endcomment %}
-        {%- if is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or card_product.compare_at_price_max > card_product.price -%}
+        {%- if is_preproduction or is_sold_out or is_coming_soon or is_new_drop or is_restock or is_last_pieces or card_product.compare_at_price_max > card_product.price -%}
           <div class="product-card-minimal__badge-stack" aria-label="Ürün etiketleri">
-            {%- if is_sold_out -%}
+            {%- if is_preproduction -%}
+              <span class="product-card-minimal__badge product-card-minimal__badge--preproduction">PRE-PRODUCTION</span>
+            {%- elsif is_sold_out -%}
               <span class="product-card-minimal__badge product-card-minimal__badge--sold-out">SOLD OUT</span>
             {%- elsif is_coming_soon -%}
               <span class="product-card-minimal__badge product-card-minimal__badge--coming-soon">COMING SOON</span>

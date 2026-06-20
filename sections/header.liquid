@@ -56,6 +56,17 @@
           >PRODUCTS</a>
         </li>
 
+        {%- if section.settings.production_collection != blank -%}
+          <li class="nbhd-header__nav-item">
+            <a
+              href="{{ section.settings.production_collection.url }}"
+              class="nbhd-header__nav-link{% if request.path == section.settings.production_collection.url %} is-active{% endif %}"
+            >
+              {{ section.settings.production_collection_label | default: 'PRE-PRODUCTION' | escape }}
+            </a>
+          </li>
+        {%- endif -%}
+
         {%- comment %} KATEGORİLER + HOVER DROPDOWN {%- endcomment %}
         <li class="nbhd-header__nav-item nbhd-header__nav-item--has-drop">
           <a
@@ -167,6 +178,11 @@
 
     <nav class="nbhd-drawer__body">
       <a class="nbhd-drawer__main-link" href="{{ routes.all_products_collection_url }}">products</a>
+      {%- if section.settings.production_collection != blank -%}
+        <a class="nbhd-drawer__main-link" href="{{ section.settings.production_collection.url }}">
+          {{ section.settings.production_collection_label | default: 'pre-production' | escape }}
+        </a>
+      {%- endif -%}
 
       <div class="nbhd-drawer__section">
         <span class="nbhd-drawer__section-label">categories</span>
@@ -474,6 +490,17 @@ document.querySelectorAll('.nbhd-header__nav-item--has-drop').forEach(function(i
         { "value": "always",            "label": "Always" },
         { "value": "reduce-logo-size",  "label": "Always (reduced logo)" }
       ]
+    },
+    {
+      "type": "collection",
+      "id": "production_collection",
+      "label": "Pre-production collection"
+    },
+    {
+      "type": "text",
+      "id": "production_collection_label",
+      "label": "Pre-production menu label",
+      "default": "PRE-PRODUCTION"
     }
   ],
   "blocks": [{ "type": "@app" }]
