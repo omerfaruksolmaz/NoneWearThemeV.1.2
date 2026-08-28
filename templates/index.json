@@ -70,7 +70,7 @@
         "heading": "Drop",
         "note": "None is more",
         "collection": "all",
-        "products_to_show": 12,
+        "products_to_show": 60,
         "columns_desktop": 6,
         "show_vendor": false,
         "show_product_type": false,
