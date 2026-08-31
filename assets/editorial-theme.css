@@ -6569,3 +6569,18 @@ cart-items:not(.is-empty) .nw-cart__empty { display: none; }
   font-size: 1.15em;
   text-transform: lowercase;
 }
+
+
+/* Mobile tap targets: preserve the editorial layout while meeting touch-size guidance. */
+@media (pointer: coarse) {
+  .editorial-hero__view .editorial-link,
+  .editorial-footer__contact a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4.4rem;
+  }
+
+  .product-card-minimal__link {
+    min-height: 4.4rem;
+  }
+}
