@@ -5,12 +5,34 @@
   assign product_form_id = 'product-form-' | append: section.id
   assign material_metafield = product.metafields.custom.material
   if material_metafield == blank
+    assign material_metafield = product.metafields.custom.fabric_type
+  endif
+  if material_metafield == blank
+    assign material_metafield = product.metafields.custom.fabric
+  endif
+  if material_metafield == blank
+    assign material_metafield = product.metafields.custom.kumas_tipi
+  endif
+  if material_metafield == blank
+    assign material_metafield = product.metafields.custom.kumas
+  endif
+  if material_metafield == blank
     assign material_metafield = product.metafields.details.material
   endif
 
   assign material_value = blank
   if material_metafield != blank
     assign material_value = material_metafield.value | default: material_metafield
+  endif
+
+  assign delivery_link_url = section.settings.delivery_link_url
+  if delivery_link_url contains '/pages/delivery-returns'
+    assign delivery_returns_page = pages['delivery-returns']
+    if delivery_returns_page != blank
+      assign delivery_link_url = delivery_returns_page.url
+    else
+      assign delivery_link_url = blank
+    endif
   endif
 
   assign fit_metafield = product.metafields.custom.fit
@@ -317,6 +339,9 @@
         {%- when 'custom_liquid' -%}
           {{ block.settings.custom_liquid }}
         {%- when 'collapsible_tab' -%}
+          {%- if block.id == 'materials' and material_value == blank and block.settings.content == blank and block.settings.page == blank -%}
+            {% continue %}
+          {%- endif -%}
           <div class="editorial-product__accordion" {{ block.shopify_attributes }}>
             <details>
               <summary>
@@ -326,8 +351,12 @@
                 <span class="editorial-meta">+</span>
               </summary>
               <div class="editorial-product__accordion-content rte">
-                {{ block.settings.content }}
-                {{ block.settings.page.content }}
+                {%- if block.id == 'materials' and material_value != blank -%}
+                  <p>{{ material_value | join: ', ' | escape }}</p>
+                {%- else -%}
+                  {{ block.settings.content }}
+                  {{ block.settings.page.content }}
+                {%- endif -%}
               </div>
             </details>
           </div>
@@ -363,15 +392,15 @@
       </div>
     {%- endif -%}
 
-    {%- if section.settings.support_link_label != blank or section.settings.delivery_link_label != blank -%}
+    {%- if section.settings.support_link_label != blank and section.settings.support_link_url != blank or section.settings.delivery_link_label != blank and delivery_link_url != blank -%}
       <div class="editorial-product__support-links">
         {%- if section.settings.support_link_label != blank and section.settings.support_link_url != blank -%}
           <a class="editorial-link" href="{{ section.settings.support_link_url }}">
             {{ section.settings.support_link_label | escape }}
           </a>
         {%- endif -%}
-        {%- if section.settings.delivery_link_label != blank and section.settings.delivery_link_url != blank -%}
-          <a class="editorial-link" href="{{ section.settings.delivery_link_url }}">
+        {%- if section.settings.delivery_link_label != blank and delivery_link_url != blank -%}
+          <a class="editorial-link" href="{{ delivery_link_url }}">
             {{ section.settings.delivery_link_label | escape }}
           </a>
         {%- endif -%}
