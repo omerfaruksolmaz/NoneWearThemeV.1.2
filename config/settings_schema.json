@@ -1400,6 +1400,23 @@
     ]
   },
   {
+    "name": "Tracking & privacy",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "meta_pixel_enabled",
+        "label": "Enable Meta Pixel",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "meta_pixel_id",
+        "label": "Meta Pixel ID",
+        "info": "The pixel loads only when Shopify allows marketing and data-sharing processing for the visitor."
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.cart.name",
     "settings": [
       {
