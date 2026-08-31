@@ -23,5 +23,18 @@ jobs:
       - name: Install Theme Check
         run: gem install theme-check
 
+      - name: Validate theme JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          paths = [*Path('config').glob('*.json'), *Path('templates').rglob('*.json'), *Path('locales').glob('*.json')]
+          for path in paths:
+              with path.open(encoding='utf-8') as source:
+                  json.load(source)
+          print(f'Validated {len(paths)} JSON files.')
+          PY
+
       - name: Run Theme Check
         run: theme-check . --fail-level error
