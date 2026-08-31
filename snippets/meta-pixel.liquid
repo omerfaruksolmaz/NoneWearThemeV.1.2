@@ -1,0 +1,55 @@
+{% comment %}
+  Meta Pixel is loaded only after Shopify permits marketing and data-sharing
+  processing for the visitor.
+{% endcomment %}
+{%- if settings.meta_pixel_enabled and settings.meta_pixel_id != blank -%}
+  <script>
+    (function () {
+      var pixelId = {{ settings.meta_pixel_id | json }};
+      var pixelLoaded = false;
+
+      function canLoadMetaPixel() {
+        var privacy = window.Shopify && window.Shopify.customerPrivacy;
+
+        if (!privacy || typeof privacy.marketingAllowed !== 'function' || typeof privacy.saleOfDataAllowed !== 'function') {
+          return false;
+        }
+
+        try {
+          return privacy.marketingAllowed() && privacy.saleOfDataAllowed();
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function loadMetaPixel() {
+        if (pixelLoaded || !canLoadMetaPixel()) return;
+
+        pixelLoaded = true;
+
+        !(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return;
+          n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+          };
+          if (!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = true;
+          n.version = '2.0';
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = true;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+
+        window.fbq('init', pixelId);
+        window.fbq('track', 'PageView');
+      }
+
+      document.addEventListener('visitorConsentCollected', loadMetaPixel);
+      loadMetaPixel();
+    })();
+  </script>
+{%- endif -%}
