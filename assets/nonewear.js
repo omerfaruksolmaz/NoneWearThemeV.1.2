@@ -381,6 +381,22 @@
   function initAnalytics(root) {
     root = root || document;
 
+    var productView = root.querySelector('[data-nw-product-view]');
+    if (productView) {
+      window.__nwViewedProducts = window.__nwViewedProducts || {};
+      var viewedProductId = productView.dataset.nwProductId || '';
+      if (viewedProductId && !window.__nwViewedProducts[viewedProductId]) {
+        window.__nwViewedProducts[viewedProductId] = true;
+        pushNwEvent('view_item', {
+          product_id: viewedProductId,
+          product_title: productView.dataset.nwProductTitle || '',
+          value: (parseInt(productView.dataset.nwProductPrice, 10) || 0) / 100,
+          currency: productView.dataset.nwProductCurrency || 'TRY',
+          context: 'product_page'
+        });
+      }
+    }
+
     root.querySelectorAll('[data-nw-analytics]').forEach(function (el) {
       if (el.__nwAnalyticsBound) return;
       el.__nwAnalyticsBound = true;
@@ -402,6 +418,36 @@
       pushNwEvent('search_no_results', {
         search_term: input ? input.value : '',
         context: 'search'
+      });
+    }
+
+    if (!window.__nwCommerceAnalyticsBound) {
+      window.__nwCommerceAnalyticsBound = true;
+
+      if (typeof subscribe !== 'undefined' && typeof PUB_SUB_EVENTS !== 'undefined') {
+        subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
+          if (!event || event.source !== 'product-form') return;
+          var cartData = event.cartData || {};
+          var variantId = String(event.productVariantId || '');
+          var item = (cartData.items || []).find(function (cartItem) {
+            return String(cartItem.id || cartItem.variant_id || '') === variantId;
+          });
+          pushNwEvent('add_to_cart', {
+            product_id: item ? String(item.product_id || '') : '',
+            variant_id: variantId,
+            product_title: item ? item.product_title || item.title || '' : '',
+            value: item ? (item.final_price || item.price || 0) / 100 : 0,
+            currency: cartData.currency || 'TRY',
+            quantity: item ? item.quantity || 1 : 1,
+            context: 'product_form'
+          });
+        });
+      }
+
+      document.addEventListener('click', function (event) {
+        var checkout = event.target.closest('button[name="checkout"], a[href*="/checkout"]');
+        if (!checkout) return;
+        pushNwEvent('begin_checkout', { context: 'cart' });
       });
     }
   }

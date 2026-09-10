@@ -15,7 +15,7 @@
 <section class="related-products section-{{ section.id }}-padding">
   <product-recommendations
     class="page-width"
-    data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}"
+    data-url="{{ routes.product_recommendations_url }}?limit={{ section.settings.products_to_show }}&intent={{ section.settings.intent }}"
     data-section-id="{{ section.id }}"
     data-product-id="{{ product.id }}"
   >
@@ -48,6 +48,16 @@
       "id": "heading",
       "label": "Heading",
       "default": "Related items"
+    },
+    {
+      "type": "select",
+      "id": "intent",
+      "label": "Recommendation type",
+      "default": "related",
+      "options": [
+        { "value": "related", "label": "Related products" },
+        { "value": "complementary", "label": "Complementary products" }
+      ]
     },
     {
       "type": "range",

@@ -13,10 +13,9 @@
 <section class="nw-collection-list">
   <div class="page-width">
     {%- paginate collections by 30 -%}
-      {%- assign visible_collections = collections | where: 'handle' -%}
       <div class="nw-collection-grid">
         {%- for col in collections -%}
-          {%- unless col.handle == 'frontpage' -%}
+          {%- unless col.handle == 'frontpage' or col.handle == 'all' or col.products_count == 0 -%}
             <a class="nw-col-card" href="{{ col.url }}">
               <div class="nw-col-card__media">
                 {%- if col.featured_image -%}
@@ -38,7 +37,7 @@
               </div>
               <div class="nw-col-card__body">
                 <div class="nw-col-card__title">{{ col.title | escape }}</div>
-                <div class="nw-col-card__count">{{ col.products_count }} products</div>
+                <div class="nw-col-card__count">{{ 'products.facets.product_count_simple' | t: count: col.products_count }}</div>
               </div>
             </a>
           {%- endunless -%}

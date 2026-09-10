@@ -37,9 +37,9 @@
           type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          placeholder="search"
+          placeholder="{{ 'nonewear.navigation.search' | t }}"
           autocomplete="off"
-          aria-label="Search"
+          aria-label="{{ 'nonewear.navigation.search' | t }}"
         >
       </form>
     </div>
@@ -53,7 +53,7 @@
           <a
             href="{{ routes.all_products_collection_url }}"
             class="nbhd-header__nav-link{% if request.path == routes.all_products_collection_url %} is-active{% endif %}"
-          >PRODUCTS</a>
+          >{{ 'nonewear.navigation.products' | t }}</a>
         </li>
 
         {%- if section.settings.production_collection != blank -%}
@@ -72,17 +72,17 @@
           <a
             href="{{ routes.collections_url }}"
             class="nbhd-header__nav-link{% if request.path contains '/collections' %} is-active{% endif %}"
-          >CATEGORIES</a>
+          >{{ 'nonewear.navigation.categories' | t }}</a>
 
           <div class="nbhd-drop" aria-hidden="true">
             <ul class="nbhd-drop__list">
               <li class="nbhd-drop__item">
                 <a class="nbhd-drop__link" href="{{ routes.all_products_collection_url }}">
-                  <span class="nbhd-drop__label">All Products</span>
+                  <span class="nbhd-drop__label">{{ 'nonewear.navigation.all_products' | t }}</span>
                 </a>
               </li>
               {%- for col in collections -%}
-                {%- unless col.handle == 'all' or col.handle == 'frontpage' -%}
+                {%- unless col.handle == 'all' or col.handle == 'frontpage' or col.products_count == 0 -%}
                   <li class="nbhd-drop__item">
                     <a class="nbhd-drop__link{% if request.path contains col.handle %} is-active{% endif %}" href="{{ col.url }}">
                       <span class="nbhd-drop__label">{{ col.title | escape }}</span>
@@ -104,13 +104,13 @@
         href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
         class="nbhd-header__util-link"
         rel="nofollow"
-        aria-label="Account"
+        aria-label="{{ 'nonewear.navigation.account' | t }}"
       >
-        {%- if customer -%}ACCOUNT{%- else -%}LOGIN{%- endif -%}
+        {%- if customer -%}{{ 'nonewear.navigation.account' | t }}{%- else -%}{{ 'nonewear.navigation.login' | t }}{%- endif -%}
       </a>
       <div class="nbhd-header__cart-wrap" id="nbhd-cart-wrap">
-        <a href="{{ routes.cart_url }}" class="nbhd-header__util-link nbhd-header__cart-link" aria-label="Cart">
-          CART
+        <a href="{{ routes.cart_url }}" class="nbhd-header__util-link nbhd-header__cart-link" aria-label="{{ 'nonewear.navigation.cart' | t }}">
+          {{ 'nonewear.navigation.cart' | t }}
           <span id="cart-icon-bubble">
             {%- if cart.item_count > 0 -%}
               <span class="nbhd-header__cart-bubble">{{ cart.item_count }}</span>
@@ -132,8 +132,8 @@
 
     {%- comment %} MOBILE UTILS {%- endcomment %}
     <div class="nbhd-header__mobile-utils">
-      <a href="{{ routes.cart_url }}" class="nbhd-header__mobile-cart" aria-label="Cart">
-        CART
+      <a href="{{ routes.cart_url }}" class="nbhd-header__mobile-cart" aria-label="{{ 'nonewear.navigation.cart' | t }}">
+        {{ 'nonewear.navigation.cart' | t }}
         {%- if cart.item_count > 0 -%}
           <span class="nbhd-header__cart-bubble">{{ cart.item_count }}</span>
         {%- endif -%}
@@ -141,7 +141,7 @@
 
       <button
         class="nbhd-header__hamburger"
-        aria-label="Open menu"
+        aria-label="{{ 'nonewear.navigation.open_menu' | t }}"
         aria-expanded="false"
         aria-controls="nbhd-mobile-drawer"
       >
@@ -159,7 +159,7 @@
 
     <div class="nbhd-drawer__header">
       <a href="{{ routes.root_url }}" class="nbhd-drawer__logo">none wear</a>
-      <button class="nbhd-drawer__close" aria-label="Close">&#10005;</button>
+      <button class="nbhd-drawer__close" aria-label="{{ 'accessibility.close' | t }}">&#10005;</button>
     </div>
 
     <div class="nbhd-drawer__search">
@@ -170,14 +170,15 @@
           type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          placeholder="search"
+          placeholder="{{ 'nonewear.navigation.search' | t }}"
+          aria-label="{{ 'nonewear.navigation.search' | t }}"
           autocomplete="off"
         >
       </form>
     </div>
 
     <nav class="nbhd-drawer__body">
-      <a class="nbhd-drawer__main-link" href="{{ routes.all_products_collection_url }}">products</a>
+      <a class="nbhd-drawer__main-link" href="{{ routes.all_products_collection_url }}">{{ 'nonewear.navigation.products' | t }}</a>
       {%- if section.settings.production_collection != blank -%}
         <a class="nbhd-drawer__main-link" href="{{ section.settings.production_collection.url }}">
           {{ section.settings.production_collection_label | default: 'pre-production' | escape }}
@@ -185,11 +186,11 @@
       {%- endif -%}
 
       <div class="nbhd-drawer__section">
-        <span class="nbhd-drawer__section-label">categories</span>
+        <span class="nbhd-drawer__section-label">{{ 'nonewear.navigation.categories' | t }}</span>
         <ul class="nbhd-drawer__cat-list">
-          <li><a href="{{ routes.all_products_collection_url }}">All Products</a></li>
+          <li><a href="{{ routes.all_products_collection_url }}">{{ 'nonewear.navigation.all_products' | t }}</a></li>
           {%- for col in collections -%}
-            {%- unless col.handle == 'all' or col.handle == 'frontpage' -%}
+            {%- unless col.handle == 'all' or col.handle == 'frontpage' or col.products_count == 0 -%}
               <li>
                 <a href="{{ col.url }}">
                   {{ col.title | escape }}
@@ -204,10 +205,10 @@
 
     <div class="nbhd-drawer__footer">
       <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}">
-        {%- if customer -%}account{%- else -%}login{%- endif -%}
+        {%- if customer -%}{{ 'nonewear.navigation.account' | t }}{%- else -%}{{ 'nonewear.navigation.login' | t }}{%- endif -%}
       </a>
       <a href="{{ routes.cart_url }}">
-        cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}
+        {{ 'nonewear.navigation.cart' | t }}{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}
       </a>
     </div>
 

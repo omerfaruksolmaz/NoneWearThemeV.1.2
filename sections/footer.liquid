@@ -44,7 +44,7 @@
       <hr class="editorial-footer__rule">
 
       <p class="editorial-footer__brand-desc">
-        {{ section.settings.brand_text | default: 'None Wear is a clothing brand founded in 2025.' }}
+        {{ section.settings.brand_text | default: 'None Wear, 2025 yılında kurulan bağımsız bir Y2K ve streetwear markasıdır.' }}
       </p>
 
       <p class="editorial-footer__contact">
@@ -54,10 +54,10 @@
     </div>
 
     <div class="editorial-footer__column">
-      <h2 class="editorial-footer__heading">Shop</h2>
+      <h2 class="editorial-footer__heading">Mağaza</h2>
       <hr class="editorial-footer__rule">
       <ul class="editorial-footer__menu">
-        <li><a href="{{ routes.collections_url }}">Tüm ürünler</a></li>
+        <li><a href="{{ routes.all_products_collection_url }}">Tüm ürünler</a></li>
         <li><a href="{{ routes.root_url }}#drop">Drop</a></li>
         <li><a href="{{ routes.search_url }}">Arama</a></li>
         <li><a href="{{ routes.cart_url }}">Sepet</a></li>
@@ -81,15 +81,12 @@
       <h2 class="editorial-footer__heading">Koleksiyonlar</h2>
       <hr class="editorial-footer__rule">
       <ul class="editorial-footer__menu">
-        {%- liquid
-          # Koleksiyonlar otomatik listelenir; footer şişmesin diye en fazla 5 tane
-          assign footer_collection_count = 0
-        -%}
-        {%- for col in collections -%}
-          {%- if col.handle == 'all' or col.handle == 'frontpage' or col.products_count == 0 -%}{%- continue -%}{%- endif -%}
-          {%- if footer_collection_count >= 5 -%}{%- break -%}{%- endif -%}
-          <li><a href="{{ col.url }}">{{ col.title | escape }}</a></li>
-          {%- assign footer_collection_count = footer_collection_count | plus: 1 -%}
+        {%- assign footer_collection_handles = 'bluz,t-shirt,pantolon,elbise,hirka' | split: ',' -%}
+        {%- for collection_handle in footer_collection_handles -%}
+          {%- assign col = collections[collection_handle] -%}
+          {%- if col != blank and col.products_count > 0 -%}
+            <li><a href="{{ col.url }}">{{ col.title | escape }}</a></li>
+          {%- endif -%}
         {%- endfor -%}
         <li><a href="{{ routes.collections_url }}">Tüm koleksiyonlar</a></li>
       </ul>
@@ -133,7 +130,7 @@
 
       {%- if section.settings.show_social and has_social_links -%}
         <div class="editorial-footer__social-wrap">
-          <h2 class="editorial-footer__heading">Social</h2>
+          <h2 class="editorial-footer__heading">Sosyal</h2>
           <hr class="editorial-footer__rule">
           <ul class="editorial-footer__social">
             {%- if settings.social_instagram_link != blank -%}
@@ -160,7 +157,7 @@
 
   <div class="editorial-footer__bottom">
     <span>© {{ 'now' | date: '%Y' }} <span class="editorial-footer__brand-mark">none wear</span></span>
-    <span>All rights reserved</span>
+    <span>{{ 'nonewear.footer.rights' | t }}</span>
   </div>
 </div>
 </footer>

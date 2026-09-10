@@ -17,8 +17,8 @@
           "settings": {
             "label": "None Wear",
             "heading": "NEW SEASON: BAGGY PANTS",
-            "body": "<p>Nonewear is built for those who don’t follow trends.<br/>Y2K-inspired fits with an underground edge.<br/>Step in. Stand out.</p>",
-            "link_label": "Drop'u gör",
+            "body": "<p>Kuralları takip etmeyenler için tasarlandı.<br/>Underground dokunuşlu Y2K silüetler.<br/>Öne çık.</p>",
+            "link_label": "Baggy seçkisini gör",
             "link": "shopify://collections/jeans"
           }
         },
@@ -27,9 +27,9 @@
           "settings": {
             "label": "Drop",
             "heading": "Outside the system.",
-            "body": "<p>Not for everyone.<br/>Y2K streetwear with attitude.<br/>Nonewear.</p>",
-            "link_label": "Drop'u gör",
-            "link": "shopify://collections/all"
+            "body": "<p>Herkes için değil.<br/>Tavrı olan Y2K streetwear.<br/>None Wear.</p>",
+            "link_label": "Y2K seçkisini gör",
+            "link": "shopify://collections/y2k-crop-edit"
           }
         },
         "note_3": {
@@ -37,24 +37,20 @@
           "settings": {
             "label": "Mood",
             "heading": "Dress up. Fade out.",
-            "body": "<p>Your next favorite fit is here.<br/>Baggy, bold, and built different.<br/>Shop the latest Y2K drops.</p>",
-            "link_label": "Drop'u gör",
-            "link": "shopify://collections/all"
+            "body": "<p>Sıradaki favori parçanı bul.<br/>Cesur, özgür ve farklı.<br/>Yeni drop şimdi yayında.</p>",
+            "link_label": "Yeni gelenleri gör",
+            "link": "shopify://collections/yeni-gelenler"
           }
         }
       },
-      "block_order": [
-        "note_1",
-        "note_2",
-        "note_3"
-      ],
+      "block_order": ["note_1", "note_2", "note_3"],
       "settings": {
         "image": "shopify://shop_images/none-wear-1187863191-3_f62800eb-13b5-45fc-b2c8-8b98f05fe6aa.png",
-        "image_link": "",
+        "image_link": "shopify://collections/jeans",
         "vertical_label": "None Wear",
         "season_label": "Kuralsız stil",
-        "view_link_label": "Drop'u gör",
-        "view_link": "shopify://collections/all",
+        "view_link_label": "Yeni drop'u gör",
+        "view_link": "shopify://collections/yeni-gelenler",
         "brand_statement": "No rules.Outside the system.Dress up. Fade out.",
         "hero_height": 400,
         "slide_collection": "",
@@ -64,24 +60,45 @@
         "padding_bottom": 0
       }
     },
+    "shop_by_style": {
+      "type": "collection-list",
+      "blocks": {
+        "bluz": { "type": "featured_collection", "settings": { "collection": "bluz" } },
+        "tshirt": { "type": "featured_collection", "settings": { "collection": "t-shirt" } },
+        "pantolon": { "type": "featured_collection", "settings": { "collection": "pantolon" } },
+        "elbise": { "type": "featured_collection", "settings": { "collection": "elbise" } },
+        "sort": { "type": "featured_collection", "settings": { "collection": "sort-bermuda" } },
+        "hirka": { "type": "featured_collection", "settings": { "collection": "hirka" } }
+      },
+      "block_order": ["bluz", "tshirt", "pantolon", "elbise", "sort", "hirka"],
+      "settings": {
+        "title": "Tarzına göre keşfet",
+        "heading_size": "h1",
+        "image_ratio": "portrait",
+        "columns_desktop": 3,
+        "color_scheme": "scheme-1",
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "padding_top": 36,
+        "padding_bottom": 24
+      }
+    },
     "featured_grid": {
       "type": "minimal-product-grid",
       "settings": {
-        "heading": "Drop",
-        "note": "None is more",
-        "collection": "all",
-        "products_to_show": 60,
-        "columns_desktop": 6,
+        "heading": "Yeni gelenler",
+        "note": "Yeni drop · sınırlı stok",
+        "collection": "yeni-gelenler",
+        "products_to_show": 24,
+        "columns_desktop": 4,
         "show_vendor": false,
-        "show_product_type": false,
+        "show_product_type": true,
         "show_secondary_image": true,
-        "padding_top": 0,
-        "padding_bottom": 0
+        "padding_top": 12,
+        "padding_bottom": 24
       }
     }
   },
-  "order": [
-    "hero",
-    "featured_grid"
-  ]
+  "order": ["hero", "shop_by_style", "featured_grid"]
 }

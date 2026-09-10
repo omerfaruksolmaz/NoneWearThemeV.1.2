@@ -19,6 +19,10 @@
   if material_metafield == blank
     assign material_metafield = product.metafields.details.material
   endif
+  if material_metafield == blank
+    assign material_metafield = product.metafields.shopify.fabric
+  endif
+  assign care_metafield = product.metafields.shopify['care-instructions']
 
   assign material_value = blank
   if material_metafield != blank
@@ -38,6 +42,9 @@
   assign fit_metafield = product.metafields.custom.fit
   assign size_note_metafield = product.metafields.custom.size_note
   assign model_info_metafield = product.metafields.custom.model_info
+  assign color_pattern_metafield = product.metafields.shopify['color-pattern']
+  assign sleeve_length_metafield = product.metafields.shopify['sleeve-length-type']
+  assign top_length_metafield = product.metafields.shopify['top-length-type']
 
   assign fit_value = fit_metafield.value | default: fit_metafield | default: section.settings.fit_note_default
   assign size_note_value = size_note_metafield.value | default: size_note_metafield | default: section.settings.size_note_default
@@ -179,6 +186,11 @@
 <section
   id="ProductInfo-{{ section.id }}"
   class="editorial-product__info product__info-container{% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
+  data-nw-product-view
+  data-nw-product-id="{{ product.id }}"
+  data-nw-product-title="{{ product.title | escape }}"
+  data-nw-product-price="{{ product.selected_or_first_available_variant.price }}"
+  data-nw-product-currency="{{ cart.currency.iso_code | default: shop.currency }}"
 >
   {%- comment %} NEIGHBORHOOD.JP — vendor / marka etiketi + sold out {%- endcomment %}
   <div class="editorial-product__brand-row">
@@ -186,7 +198,7 @@
       <span class="editorial-product__vendor">{{ product.vendor | upcase | escape }}</span>
     {%- endif -%}
     {%- unless product.available -%}
-      <span class="editorial-product__sold-out-badge">SOLD OUT</span>
+      <span class="editorial-product__sold-out-badge">{{ 'products.product.sold_out' | t }}</span>
     {%- endunless -%}
     {%- if product.tags contains 'coming-soon' or product.tags contains 'coming soon' -%}
       <span class="editorial-product__coming-soon-badge">COMING SOON</span>
@@ -280,22 +292,22 @@
             {{ section.settings.size_guide_label | default: 'Beden rehberi' | escape }}
           </a>
           {%- if fit_value != blank or size_note_value != blank or model_info_value != blank -%}
-            <div class="editorial-product__fit-card" aria-label="Beden ve kalıp notları">
+            <div class="editorial-product__fit-card" aria-label="{{ 'nonewear.product.details' | t }}">
               {%- if fit_value != blank -%}
                 <div class="editorial-product__fit-line">
-                  <span>Kalıp</span>
+                  <span>{{ 'nonewear.product.fit' | t }}</span>
                   <strong>{{ fit_value | escape }}</strong>
                 </div>
               {%- endif -%}
               {%- if size_note_value != blank -%}
                 <div class="editorial-product__fit-line">
-                  <span>Beden notu</span>
+                  <span>{{ 'nonewear.product.size_note' | t }}</span>
                   <strong>{{ size_note_value | escape }}</strong>
                 </div>
               {%- endif -%}
               {%- if model_info_value != blank -%}
                 <div class="editorial-product__fit-line">
-                  <span>Model</span>
+                  <span>{{ 'nonewear.product.model' | t }}</span>
                   <strong>{{ model_info_value | escape }}</strong>
                 </div>
               {%- endif -%}
@@ -310,21 +322,51 @@
             show_pickup_availability: false
           -%}
           <div class="editorial-product__trust">
-            <div class="editorial-product__trust-grid" aria-label="Satın alma avantajları">
-              <span>Güvenli ödeme</span>
-              <span>Ücretsiz kargo</span>
+            <div class="editorial-product__trust-grid" aria-label="{{ 'nonewear.product.details' | t }}">
+              <span>{{ 'nonewear.product.secure_payment' | t }}</span>
+              <span>{{ 'nonewear.product.free_shipping' | t }}</span>
               {%- if is_preproduction -%}
                 <span>{{ production_delivery | escape }} tahmini teslimat</span>
               {%- else -%}
-                <span>1-3 iş günü teslimat</span>
+                <span>{{ 'nonewear.product.fast_delivery' | t }}</span>
               {%- endif -%}
-              <span>14 gün iade/değişim</span>
+              <span>{{ 'nonewear.product.returns' | t }}</span>
             </div>
           </div>
         {%- when 'description' -%}
           {%- if product.description != blank -%}
             <div class="editorial-product__description rte" {{ block.shopify_attributes }}>
               {{ product.description }}
+            </div>
+          {%- endif -%}
+          {%- if color_pattern_metafield != blank or sleeve_length_metafield != blank or top_length_metafield != blank -%}
+            <div class="editorial-product__accordion">
+              <details>
+                <summary>
+                  <span class="editorial-product__accordion-title">{{ 'nonewear.product.details' | t }}</span>
+                  <span class="editorial-meta">+</span>
+                </summary>
+                <div class="editorial-product__accordion-content">
+                  {%- if color_pattern_metafield != blank -%}
+                    <div class="editorial-product__technical-line">
+                      <span>{{ 'nonewear.product.color_pattern' | t }}</span>
+                      <div>{{ color_pattern_metafield | metafield_tag }}</div>
+                    </div>
+                  {%- endif -%}
+                  {%- if sleeve_length_metafield != blank -%}
+                    <div class="editorial-product__technical-line">
+                      <span>{{ 'nonewear.product.sleeve_length' | t }}</span>
+                      <div>{{ sleeve_length_metafield | metafield_tag }}</div>
+                    </div>
+                  {%- endif -%}
+                  {%- if top_length_metafield != blank -%}
+                    <div class="editorial-product__technical-line">
+                      <span>{{ 'nonewear.product.top_length' | t }}</span>
+                      <div>{{ top_length_metafield | metafield_tag }}</div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </details>
             </div>
           {%- endif -%}
         {%- when 'sku' -%}
@@ -339,7 +381,7 @@
         {%- when 'custom_liquid' -%}
           {{ block.settings.custom_liquid }}
         {%- when 'collapsible_tab' -%}
-          {%- if block.id == 'materials' and material_value == blank and block.settings.content == blank and block.settings.page == blank -%}
+          {%- if block.settings.heading contains 'Materyal' and material_value == blank and care_metafield == blank and block.settings.content == blank and block.settings.page == blank -%}
             {% continue %}
           {%- endif -%}
           <div class="editorial-product__accordion" {{ block.shopify_attributes }}>
@@ -351,8 +393,20 @@
                 <span class="editorial-meta">+</span>
               </summary>
               <div class="editorial-product__accordion-content rte">
-                {%- if block.id == 'materials' and material_value != blank -%}
-                  <p>{{ material_value | join: ', ' | escape }}</p>
+                {%- if block.settings.heading contains 'Materyal' -%}
+                  {%- if material_metafield != blank -%}
+                    {%- if material_metafield.type contains 'metaobject_reference' -%}
+                      {{ material_metafield | metafield_tag }}
+                    {%- else -%}
+                      <p>{{ material_value | join: ', ' | escape }}</p>
+                    {%- endif -%}
+                  {%- endif -%}
+                  {%- if care_metafield != blank -%}
+                    <div class="editorial-product__technical-line">
+                      <span>{{ 'nonewear.product.care' | t }}</span>
+                      <div>{{ care_metafield | metafield_tag }}</div>
+                    </div>
+                  {%- endif -%}
                 {%- else -%}
                   {{ block.settings.content }}
                   {{ block.settings.page.content }}
@@ -369,23 +423,17 @@
       {%- endcase -%}
     {%- endfor -%}
 
-    {%- if material_value != blank or product.selected_or_first_available_variant.sku != blank or product.type != blank -%}
+    {%- if product.selected_or_first_available_variant.sku != blank or product.type != blank -%}
       <div class="editorial-product__technical">
         {%- if product.selected_or_first_available_variant.sku != blank -%}
           <div class="editorial-product__technical-line">
-            <span>Ürün kodu</span>
+            <span>{{ 'nonewear.product.product_code' | t }}</span>
             <span>{{ product.selected_or_first_available_variant.sku }}</span>
-          </div>
-        {%- endif -%}
-        {%- if material_value != blank -%}
-          <div class="editorial-product__technical-line">
-            <span>Materyal</span>
-            <span>{{ material_value }}</span>
           </div>
         {%- endif -%}
         {%- if product.type != blank -%}
           <div class="editorial-product__technical-line">
-            <span>Kategori</span>
+            <span>{{ 'nonewear.product.category' | t }}</span>
             <span>{{ product.type | escape }}</span>
           </div>
         {%- endif -%}

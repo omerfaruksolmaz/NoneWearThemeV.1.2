@@ -1,4 +1,38 @@
 {
+  "nonewear": {
+    "navigation": {
+      "products": "Ürünler",
+      "categories": "Kategoriler",
+      "all_products": "Tüm ürünler",
+      "search": "Ara",
+      "account": "Hesabım",
+      "login": "Giriş",
+      "cart": "Sepet",
+      "open_menu": "Menüyü aç",
+      "home": "Ana sayfa"
+    },
+    "product": {
+      "fit": "Kalıp",
+      "size_note": "Beden notu",
+      "model": "Model",
+      "secure_payment": "Güvenli ödeme",
+      "free_shipping": "Ücretsiz kargo",
+      "fast_delivery": "1-3 iş günü teslimat",
+      "returns": "14 gün iade/değişim",
+      "product_code": "Ürün kodu",
+      "material": "Materyal",
+      "care": "Bakım",
+      "category": "Kategori",
+      "details": "Ürün detayları",
+      "sizes": "Beden seçenekleri",
+      "color_pattern": "Renk ve desen",
+      "sleeve_length": "Kol tipi",
+      "top_length": "Üst uzunluğu"
+    },
+    "footer": {
+      "rights": "Tüm hakları saklıdır"
+    }
+  },
   "general": {
     "password_page": {
       "login_form_heading": "Parolayı kullanarak mağazaya girin:",

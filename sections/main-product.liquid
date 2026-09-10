@@ -43,11 +43,11 @@
 
   {%- comment %} BREADCRUMB — ürün yol haritası {%- endcomment %}
   <nav class="nw-product-breadcrumb" aria-label="Breadcrumb">
-    <a class="nw-product-breadcrumb__link" href="{{ routes.root_url }}">HOME</a>
+    <a class="nw-product-breadcrumb__link" href="{{ routes.root_url }}">{{ 'nonewear.navigation.home' | t }}</a>
     <span class="nw-product-breadcrumb__sep" aria-hidden="true">/</span>
 
     {%- if collection != blank and collection.handle != blank -%}
-      <a class="nw-product-breadcrumb__link" href="/collections/{{ collection.handle }}">{{ collection.title | upcase | escape }}</a>
+      <a class="nw-product-breadcrumb__link" href="{{ collection.url }}">{{ collection.title | upcase | escape }}</a>
       <span class="nw-product-breadcrumb__sep" aria-hidden="true">/</span>
     {%- elsif product.type != blank -%}
       <a class="nw-product-breadcrumb__link" href="{{ routes.collections_url }}/{{ product.type | handle }}">{{ product.type | upcase | escape }}</a>
@@ -320,20 +320,17 @@
     {
       "type": "text",
       "id": "fit_note_default",
-      "label": "Default fit note",
-      "default": "Oversize / rahat kalıp"
+      "label": "Default fit note"
     },
     {
       "type": "text",
       "id": "size_note_default",
-      "label": "Default size note",
-      "default": "İki beden arasındaysan büyük bedeni seç"
+      "label": "Default size note"
     },
     {
       "type": "text",
       "id": "model_info_default",
-      "label": "Default model note",
-      "default": "Model bilgisi ürün detayında güncellenir"
+      "label": "Default model note"
     },
     {
       "type": "header",
