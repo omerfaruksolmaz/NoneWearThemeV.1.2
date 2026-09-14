@@ -189,9 +189,13 @@
             <span>Hızlı Teslimat</span>
           </div>
         {%- endif -%}
+        {%- unless is_sold_out or is_coming_soon -%}
+          <span class="product-card-minimal__cta">Ürünü ve bedenini incele <span aria-hidden="true">→</span></span>
+        {%- endunless -%}
       </div>
 
     </a>
   </article>
 
 {%- endif -%}
+

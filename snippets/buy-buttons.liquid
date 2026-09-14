@@ -80,6 +80,7 @@
         {%- endif -%}
 
         <div class="product-form__buttons">
+          <p class="product-form__decision-note">Bedenini seç, sonra sepetine ekle. Ölçü detayları ürün bilgisinde.</p>
           {%- liquid
             assign check_against_inventory = true
             if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
@@ -171,3 +172,4 @@
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
 </div>
+
