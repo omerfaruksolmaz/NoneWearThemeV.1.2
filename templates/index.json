@@ -90,7 +90,7 @@
         "heading": "Yeni gelenler",
         "note": "Yeni drop · sınırlı stok",
         "collection": "yeni-gelenler",
-        "products_to_show": 24,
+        "products_to_show": 8,
         "columns_desktop": 4,
         "show_vendor": false,
         "show_product_type": true,
