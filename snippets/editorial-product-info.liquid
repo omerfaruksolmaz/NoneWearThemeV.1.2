@@ -350,19 +350,19 @@
                   {%- if color_pattern_metafield != blank -%}
                     <div class="editorial-product__technical-line">
                       <span>{{ 'nonewear.product.color_pattern' | t }}</span>
-                      <div>{{ color_pattern_metafield | metafield_tag }}</div>
+                      <div>{{ color_pattern_metafield | metafield_tag: field: 'label' }}</div>
                     </div>
                   {%- endif -%}
                   {%- if sleeve_length_metafield != blank -%}
                     <div class="editorial-product__technical-line">
                       <span>{{ 'nonewear.product.sleeve_length' | t }}</span>
-                      <div>{{ sleeve_length_metafield | metafield_tag }}</div>
+                      <div>{{ sleeve_length_metafield | metafield_tag: field: 'label' }}</div>
                     </div>
                   {%- endif -%}
                   {%- if top_length_metafield != blank -%}
                     <div class="editorial-product__technical-line">
                       <span>{{ 'nonewear.product.top_length' | t }}</span>
-                      <div>{{ top_length_metafield | metafield_tag }}</div>
+                      <div>{{ top_length_metafield | metafield_tag: field: 'label' }}</div>
                     </div>
                   {%- endif -%}
                 </div>
@@ -396,7 +396,7 @@
                 {%- if block.settings.heading contains 'Materyal' -%}
                   {%- if material_metafield != blank -%}
                     {%- if material_metafield.type contains 'metaobject_reference' -%}
-                      {{ material_metafield | metafield_tag }}
+                      {{ material_metafield | metafield_tag: field: 'label' }}
                     {%- else -%}
                       <p>{{ material_value | join: ', ' | escape }}</p>
                     {%- endif -%}
@@ -404,7 +404,7 @@
                   {%- if care_metafield != blank -%}
                     <div class="editorial-product__technical-line">
                       <span>{{ 'nonewear.product.care' | t }}</span>
-                      <div>{{ care_metafield | metafield_tag }}</div>
+                      <div>{{ care_metafield | metafield_tag: field: 'label' }}</div>
                     </div>
                   {%- endif -%}
                 {%- else -%}

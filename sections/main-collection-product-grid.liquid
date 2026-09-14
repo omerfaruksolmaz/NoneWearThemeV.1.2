@@ -555,6 +555,12 @@
 {%- liquid
   assign collection_seo_heading = section.settings.seo_heading | strip
   assign collection_seo_body = section.settings.seo_body | strip
+  assign default_collection_seo_body = '<p>None Wear pieces are built around daily rotation, limited drops and street-ready silhouettes. Explore the latest selection with fast delivery and free shipping notes on eligible products.</p>'
+
+  if collection_seo_heading == 'Drop notes' and collection_seo_body == default_collection_seo_body
+    assign collection_seo_heading = ''
+    assign collection_seo_body = ''
+  endif
 -%}
 
 {%- if collection_seo_heading != blank or collection_seo_body != blank -%}
