@@ -36,14 +36,7 @@
       -%}
       <div class="editorial-grid editorial-grid--products" style="--editorial-columns-desktop: {{ section.settings.columns_desktop }};">
         {%- for product in sorted_products limit: section.settings.products_to_show -%}
-          {% render 'product-card-minimal',
-            card_product: product,
-            show_vendor: section.settings.show_vendor,
-            show_product_type: section.settings.show_product_type,
-            show_secondary_image: section.settings.show_secondary_image,
-            lazy_load: forloop.index > 2,
-            media_ratio: '4 / 5'
-          %}
+          {% render 'product-card-minimal', card_product: product, show_vendor: section.settings.show_vendor, show_product_type: section.settings.show_product_type, show_secondary_image: section.settings.show_secondary_image, lazy_load: forloop.index, media_ratio: '4 / 5' %}
         {%- endfor -%}
       </div>
 
@@ -161,3 +154,23 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'product-card-minimal',
+                card_product: product,
+                show_vendor: section.settings.show_vendor,
+                show_product_type: section.settings.show_product_type,
+                show_secondary_image: section.settings.show_secondary_image,
+                lazy_load: forloop.index > 2,
+                media_ratio: '4 / 5'
+              %}
+  to: "{% render 'product-card-minimal', card_product: product, show_vendor: section.settings.show_vendor,
+    show_product_type: section.settings.show_product_type, show_secondary_image: section.settings.show_secondary_image,
+    lazy_load: forloop.index, media_ratio: '4 / 5' %}"
+  position: 1710..1975
+{% endcomment %}
