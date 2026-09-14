@@ -100,5 +100,6 @@
       }
     }
   },
-  "order": ["hero", "shop_by_style", "featured_grid"]
+  "order": ["hero", "featured_grid", "shop_by_style"]
 }
+
